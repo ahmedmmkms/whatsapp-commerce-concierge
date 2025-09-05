@@ -54,3 +54,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
   - Added dependency `@vendia/serverless-express` in `packages/api/package.json`.
 - Web: Added optional rewrite in `packages/web/next.config.js` to proxy `/api/*` to `NEXT_PUBLIC_API_URL` if set.
 - Deploy plan: Use two Vercel projects with root directories `packages/api` and `packages/web`.
+
+== 0010: Vercel Build Fixes ==
+- API build on Vercel failed due to missing `express` types at compile time.
+- Added runtime dep `express` and dev dep `@types/express` in `packages/api/package.json`.
