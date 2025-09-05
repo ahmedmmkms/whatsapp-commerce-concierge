@@ -81,3 +81,25 @@ Log Purpose: Running timeline and decisions for smooth handover.
 == 0016: Vercel Adapter Adjustment ==
 - Replaced `@vendia/serverless-express` usage with direct Express handler in `packages/api/api/[[...slug]].ts`.
 - Reason: Vercel Node functions provide Node req/res, and serverless-express expected AWS event shape, causing "Unable to determine event source" errors.
+
+== 0017: Vercel Deployments (API + Web) ==
+- API deployed to Vercel (serverless Node function).
+  - Verified `GET /healthz` returns 200 JSON.
+  - Key fixes: ESM import extension (`main.js`), `await app.init()` for serverless, add `class-validator`/`class-transformer`, remove AWS-style adapter in favor of direct Express handler, add `packages/api/vercel.json` with `@vercel/node` build + catch-all route.
+- Web deployed to Vercel (Next.js, Root: `packages/web`).
+  - Env: set `NEXT_PUBLIC_API_URL` to the API URL.
+  - Rewrite in `packages/web/next.config.js` proxies `/api/*` to API; verified `/api/healthz` works.
+- CI/CD hygiene:
+  - pnpm version conflict resolved in `ci.yml` (rely on root `packageManager`).
+  - Render deploy workflow guarded without using `secrets` in `if:`.
+  - DeveloperLog PR check in place.
+
+== 0018: Next Steps / Parking Lot ==
+- Tighten CORS: restrict to web domain(s) instead of `origin: true`.
+- WhatsApp: set `WHATSAPP_*` envs on API; verify webhook in Meta console.
+- Stripe: set `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`; send test event to `/payments/stripe/webhook`.
+- DB/Cache: provision Neon & Upstash; update `DATABASE_URL`/`REDIS_URL` on Vercel; add simple health endpoints.
+- ORM & Migrations: choose Prisma or TypeORM; add models and migration workflow.
+- Observability: add `SENTRY_DSN`; wire error reporting (optional).
+- E2E: add Playwright smoke tests for browse→cart→checkout; RTL checks.
+- Cleanup: remove `@vendia/serverless-express` from API deps (no longer used) and refresh lockfile.
