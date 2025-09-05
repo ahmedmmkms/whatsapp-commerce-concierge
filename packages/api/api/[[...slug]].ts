@@ -1,13 +1,11 @@
-import serverlessExpress from '@vendia/serverless-express';
 import { createApp } from '../src/main.js';
 
-let cachedHandler: ReturnType<typeof serverlessExpress> | null = null;
+let cachedExpressApp: any = null;
 
 export default async function handler(req: any, res: any) {
-  if (!cachedHandler) {
+  if (!cachedExpressApp) {
     const nestApp = await createApp();
-    const expressApp = nestApp.getHttpAdapter().getInstance();
-    cachedHandler = serverlessExpress({ app: expressApp });
+    cachedExpressApp = nestApp.getHttpAdapter().getInstance();
   }
-  return cachedHandler!(req as any, res as any);
+  return cachedExpressApp(req, res);
 }

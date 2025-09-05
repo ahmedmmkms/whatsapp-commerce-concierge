@@ -77,3 +77,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
 == 0015: Validation Dependencies ==
 - Vercel crash due to missing `class-validator` when using `ValidationPipe`.
 - Added `class-validator` and `class-transformer` to `packages/api/package.json` dependencies.
+
+== 0016: Vercel Adapter Adjustment ==
+- Replaced `@vendia/serverless-express` usage with direct Express handler in `packages/api/api/[[...slug]].ts`.
+- Reason: Vercel Node functions provide Node req/res, and serverless-express expected AWS event shape, causing "Unable to determine event source" errors.
