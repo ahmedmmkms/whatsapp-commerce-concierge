@@ -1,0 +1,44 @@
+Project: P1 – WhatsApp Commerce Concierge
+Author: AMM
+Log Purpose: Running timeline and decisions for smooth handover.
+
+== 0001: Catalog Review ==
+- Read gcc_mena_portfolio_catalog.html and extracted P1 scope, stack, NFRs, APIs, milestones, KPIs, risks.
+- Key endpoints: /webhook/whatsapp, /cart/*, /checkout, /orders/{id}, /returns.
+- Stack: NestJS API, Next.js Web, PostgreSQL, Redis, BullMQ; Dockerized; Jest/Playwright; WhatsApp Cloud API; Stripe (test) + COD.
+
+== 0002: Sprint 0 Plan ==
+- Goals: CI/CD, Docker, API/Web skeletons, env templates, seeds, free hosted demo targets.
+- Hosting targets (free tiers): Render (API), Vercel (Web), Neon (Postgres), Upstash (Redis).
+- Design kit: shadcn/ui + Tailwind + Radix + lucide; RTL support.
+
+== 0003: Scaffolding Decisions ==
+- Monorepo: pnpm workspace with packages/api (NestJS) and packages/web (Next.js 14 App Router).
+- ORM: Placeholder wiring to Postgres; choose TypeORM/Prisma later (kept neutral in code to unblock wiring).
+- CI/CD: GitHub Actions for lint/test/build; deploy webhook call to Render; Vercel auto-deploy via GitHub.
+- Observability: Sentry placeholders; OpenAPI enabled on API; health checks in both apps.
+- Authoring: All packages set author to AMM.
+
+== 0004: Next Actions ==
+- Add real DB models and migrations; wire Redis/BullMQ.
+- Connect Meta WhatsApp sandbox (verify token) and Stripe test webhooks.
+- Provision free-tier services; add env vars to GitHub/hosting.
+- E2E tests for browse→cart→checkout; Arabic RTL verification.
+
+== 0005: Handoff Notes ==
+- After cloning: see docs/sprint-0-runbook.md for setup steps.
+- Env samples in packages/*/.env.example.
+- CI will run on PRs; pushing to main triggers deploys (Render hook + Vercel Git integration).
+
+== 0006: Scaffolding Completed (Sprint 0) ==
+- Monorepo initialized (pnpm workspace). Root authored by AMM.
+- API (NestJS) with /healthz, /webhook/whatsapp (GET verify + POST ack), /payments/stripe/webhook stubs.
+- Web (Next.js 14) minimal app with Tailwind baseline; RTL kit to be added next.
+- Dockerfiles for api/web; docker-compose with Postgres/Redis.
+- CI (GitHub Actions) for build/test/lint; Deploy workflow to trigger Render via secret hook.
+- Docs: README, sprint-0-runbook, infra readme; seed SQL placeholder.
+
+== 0007: Repo & Structure ==
+- Moved project into folder: whatsapp-commerce-concierge
+- Initialized Git repository (main branch) at D:/Projects/whatsapp-commerce-concierge
+- Next step: set git user/email locally, make initial commit, add GitHub remote, push.

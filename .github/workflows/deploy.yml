@@ -1,0 +1,19 @@
+name: deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render API Deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_API != '' }}
+        run: |
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_API"
+        env:
+          RENDER_DEPLOY_HOOK_API: ${{ secrets.RENDER_DEPLOY_HOOK_API }}
+
+  # Vercel usually deploys on push via GitHub app. If needed, add CLI deploy here.
+
