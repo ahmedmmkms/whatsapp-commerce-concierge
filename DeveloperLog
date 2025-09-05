@@ -58,3 +58,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
 == 0010: Vercel Build Fixes ==
 - API build on Vercel failed due to missing `express` types at compile time.
 - Added runtime dep `express` and dev dep `@types/express` in `packages/api/package.json`.
+
+== 0011: Vercel Routing/Config Fix ==
+- Added `packages/api/vercel.json` to declare TypeScript serverless functions and route all paths to the catch-all handler.
+- Guidance: In Vercel API project, clear Output Directory (leave blank) and set Framework to Node.js or Other; no static output required.
