@@ -60,5 +60,8 @@ Log Purpose: Running timeline and decisions for smooth handover.
 - Added runtime dep `express` and dev dep `@types/express` in `packages/api/package.json`.
 
 == 0011: Vercel Routing/Config Fix ==
-- Added `packages/api/vercel.json` to declare TypeScript serverless functions and route all paths to the catch-all handler.
-- Guidance: In Vercel API project, clear Output Directory (leave blank) and set Framework to Node.js or Other; no static output required.
+- Added `packages/api/vercel.json` with stable builder syntax using `@vercel/node` and a catch-all route mapping; avoids runtime/version errors.
+- Guidance: In Vercel API project, clear Output Directory (leave blank) and set Framework to Other/Node.js; no static output required.
+
+== 0012: CI pnpm Version Conflict ==
+- Resolved GitHub Actions error by removing explicit pnpm `version` from `pnpm/action-setup` and relying on `packageManager` in root `package.json` via Corepack.
