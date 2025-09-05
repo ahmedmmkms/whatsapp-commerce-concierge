@@ -69,3 +69,4 @@ Log Purpose: Running timeline and decisions for smooth handover.
 == 0013: Vercel/@vercel-node Types + Deploy Workflow Fix ==
 - Removed `@vercel/node` type import from `packages/api/api/[[...slug]].ts` to avoid TS2307 during Vercel build; used `any` for handler args.
 - Updated `.github/workflows/deploy.yml` to avoid using `secrets` in an `if:` expression; instead guard inside the shell script.
+- Serverless crash fix: ensured `createApp()` calls `await app.init()` so Nest initializes in serverless context before handing Express app to the serverless adapter.

@@ -9,6 +9,8 @@ export async function createApp() {
   app.use(json({ limit: '1mb' }));
   app.enableCors({ origin: true, credentials: true });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  // For serverless usage, initialize the app without listening on a port
+  await app.init();
   return app;
 }
 
