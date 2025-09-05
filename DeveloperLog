@@ -65,3 +65,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
 
 == 0012: CI pnpm Version Conflict ==
 - Resolved GitHub Actions error by removing explicit pnpm `version` from `pnpm/action-setup` and relying on `packageManager` in root `package.json` via Corepack.
+
+== 0013: Vercel/@vercel-node Types + Deploy Workflow Fix ==
+- Removed `@vercel/node` type import from `packages/api/api/[[...slug]].ts` to avoid TS2307 during Vercel build; used `any` for handler args.
+- Updated `.github/workflows/deploy.yml` to avoid using `secrets` in an `if:` expression; instead guard inside the shell script.
