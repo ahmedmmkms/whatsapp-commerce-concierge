@@ -1,5 +1,5 @@
 import serverlessExpress from '@vendia/serverless-express';
-import { createApp } from '../src/main';
+import { createApp } from '../src/main.js';
 
 let cachedHandler: ReturnType<typeof serverlessExpress> | null = null;
 
