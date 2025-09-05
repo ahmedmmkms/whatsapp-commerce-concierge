@@ -73,3 +73,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
 
 == 0014: ESM Import Resolution on Vercel ==
 - Fixed module resolution error by changing serverless handler import to explicit ESM extension: `import { createApp } from '../src/main.js'` in `packages/api/api/[[...slug]].ts`.
+
+== 0015: Validation Dependencies ==
+- Vercel crash due to missing `class-validator` when using `ValidationPipe`.
+- Added `class-validator` and `class-transformer` to `packages/api/package.json` dependencies.
