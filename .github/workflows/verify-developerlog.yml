@@ -1,0 +1,39 @@
+name: Verify DeveloperLog Updated
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  check-developerlog:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed files
+        id: diff
+        run: |
+          base_sha=$(git merge-base origin/${{ github.base_ref }} HEAD)
+          echo "Base: $base_sha"
+          git diff --name-only "$base_sha" HEAD > changed.txt
+          echo "Changed files:" && cat changed.txt
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          cat changed.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Enforce DeveloperLog update
+        run: |
+          # Paths that usually require log updates
+          NEEDS_LOG=$(grep -E '^(packages/|infra/|docs/|.github/)' changed.txt | wc -l)
+          UPDATED_LOG=$(grep -E '^DeveloperLog$' changed.txt | wc -l)
+          if [ "$NEEDS_LOG" -gt 0 ] && [ "$UPDATED_LOG" -eq 0 ]; then
+            echo 'Please add an entry to DeveloperLog describing changes and decisions.'
+            echo 'Changed files suggest meaningful updates but DeveloperLog was not modified.'
+            exit 1
+          fi
+          echo 'DeveloperLog check passed.'
+

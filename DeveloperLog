@@ -42,3 +42,15 @@ Log Purpose: Running timeline and decisions for smooth handover.
 - Moved project into folder: whatsapp-commerce-concierge
 - Initialized Git repository (main branch) at D:/Projects/whatsapp-commerce-concierge
 - Next step: set git user/email locally, make initial commit, add GitHub remote, push.
+
+== 0008: Process Enforcement ==
+- Added `.github/pull_request_template.md` with a checklist item to update DeveloperLog.
+- Added CI workflow `.github/workflows/verify-developerlog.yml` to fail PRs that change core paths without updating DeveloperLog.
+
+== 0009: Vercel Serverless Setup (No Docker) ==
+- API: Added Vercel serverless adapter using `@vendia/serverless-express`.
+  - New handler: `packages/api/api/[[...slug]].ts` (catch-all) bootstraps Nest once and reuses cached handler.
+  - Refactored `packages/api/src/main.ts` to export `createApp()` for serverless usage while preserving local bootstrap.
+  - Added dependency `@vendia/serverless-express` in `packages/api/package.json`.
+- Web: Added optional rewrite in `packages/web/next.config.js` to proxy `/api/*` to `NEXT_PUBLIC_API_URL` if set.
+- Deploy plan: Use two Vercel projects with root directories `packages/api` and `packages/web`.
