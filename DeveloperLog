@@ -103,3 +103,127 @@ Log Purpose: Running timeline and decisions for smooth handover.
 - Observability: add `SENTRY_DSN`; wire error reporting (optional).
 - E2E: add Playwright smoke tests for browseâ†’cartâ†’checkout; RTL checks.
 - Cleanup: remove `@vendia/serverless-express` from API deps (no longer used) and refresh lockfile.
+
+== 0019: MVP Sprint Plan (P1 WhatsApp Commerce Concierge) ==
+- Cadence: 2-week sprints, 6 sprints total (12 weeks).
+- Team: PM, Tech Lead (Node), 1 FE, 1 BE, 1 QA, 0.5 DevOps.
+- Environments: Local (Docker Compose), Staging (Vercel API/Web, Neon, Upstash), Pilot.
+- KPIs (tracked from Sprint 2): Conversion rate, AOV, chat funnel drop-off, first-reply time.
+- NFRs: PDPL consent, PCI-aware (via gateway), 99.9% SLA, P95 API < 300ms.
+- Risks: WA onboarding delays ? sandbox first; Payments risk ? start COD + one provider; Infra quotas on free tiers.
+
+Sprint 1 (Weeks 1–2): WA Webhook, Core Dialog, Foundations
+Goals
+- Stabilize WhatsApp webhook verify/ingest; lay base conversation loop.
+- Stand up DB (Neon) + Redis (Upstash) + BullMQ wiring; choose ORM and migrations.
+- PDPL consent capture + audit trail; baseline observability.
+Deliverables
+- API: /webhook/whatsapp (verify + message ingest), /healthz improved.
+- Data: Conversation, Customer models; migration pipeline; seeds.
+- Infra: Redis/BullMQ configured; rate limiting; CORS tightened.
+- Observability: request logging, trace IDs, error reporting, basic dashboards.
+QA/Perf
+- Unit tests for webhook verification; load test 50 RPS P95 < 200ms.
+- Security review of token handling and consent storage.
+Risks/Mitigations
+- WA sandbox only ? simulate inbound events via fixtures; decouple from Meta uptime.
+
+Sprint 2 (Weeks 3–4): Catalog Sync + Browse
+Goals
+- Implement catalog ingestion and search; enable conversational browse in WA.
+Deliverables
+- API: /catalog sync job (from demo feed), /products query.
+- Data: Product model (SKU, price, stock, media), category facets.
+- WA flows: intents for categories, product details, quick replies (Arabic/English).
+- Web: Minimal product detail preview for internal QA; RTL baseline.
+QA/Perf
+- Playwright smoke for browse intents; stock/price consistency checks.
+- P95 product lookup < 150ms (cached), warm Redis keys.
+Risks/Mitigations
+- Catalog source instability ? file-based seed fallback and nightly sync.
+
+Sprint 3 (Weeks 5–6): Conversational Cart
+Goals
+- Add cart creation/persistence and line-item ops via chat.
+Deliverables
+- API: /cart/* (create, add, update, remove, view), idempotency keys.
+- Data: Cart, CartItem linked to Conversation/Customer.
+- WA flows: add to cart, view cart, update qty, remove, shipping estimate stub.
+- Pricing: tax/shipping placeholders; currency handling.
+QA/Perf
+- Unit/E2E for cart ops; concurrency tests; message templates localized.
+- P95 cart ops < 200ms; Redis caching for catalog calls.
+Risks/Mitigations
+- Session confusion across devices ? bind cart to WA sender ID + TTL.
+
+Sprint 4 (Weeks 7–8): Checkout (COD + Stripe)
+Goals
+- Implement checkout with COD baseline and Stripe card in test.
+Deliverables
+- API: /checkout (init, confirm), payments abstraction; /payments/stripe/webhook hardened.
+- Data: Order, Payment models; idempotent order creation; address capture flow.
+- WA flows: address/notes collection, payment handoff link for Stripe, COD confirmation.
+- Compliance: PCI-aware (redirect to provider), PDPL consent replay on checkout.
+QA/Perf
+- E2E: browse ? cart ? checkout (COD and Stripe test); retry-safe payments.
+- P95 checkout init < 250ms (excluding provider redirect).
+Risks/Mitigations
+- Payment failures ? optimistic order reserve + state machine retries.
+
+Sprint 5 (Weeks 9–10): Orders, Tracking, Returns, Basic CMS
+Goals
+- Expose order status, returns ticketing, and operator content controls.
+Deliverables
+- API: /orders/{id}, /orders (lookup by phone), /returns (create, status).
+- Data: Return model; status events; SLA timers; basic CMS for quick replies/templates.
+- WA flows: order status, start return, RMA guidance, human handoff keyword.
+- Web: Minimal order lookup page (phone + order ID) for support.
+QA/Perf
+- Playwright E2E for order status and returns; Arabic RTL content review.
+- Ops runbooks and on-call alerts for failed jobs/webhooks.
+Risks/Mitigations
+- Abuse on returns ? simple rules (time window, item condition prompts).
+
+Sprint 6 (Weeks 11–12): Hardening, UAT, Pilot Go-Live
+Goals
+- Close NFRs, observability, and readiness; execute UAT and pilot.
+Deliverables
+- Perf: Load test to projected traffic; tune DB indexes, Redis TTLs.
+- Reliability: Circuit breakers, retries/backoff, DLQs for BullMQ; backup/restore drills.
+- Security/Compliance: PDPL data export/delete, consent logs, privacy notices; checklist sign-off.
+- Ops: Dashboards (SLA, P95, funnel), alerts, runbooks; incident templates.
+- Docs: API OpenAPI finalized; support SOP; playbook for WhatsApp number migration.
+QA/Acceptance
+- UAT checklist pass; rollback tested; pilot launch with monitored feature flags.
+Risks/Mitigations
+- Provider/regulatory changes ? feature flagging, gateway abstraction for payments.
+
+Cross-Cutting Threads (All Sprints)
+- i18n/RTL: Arabic-first content and templates; date/number formats.
+- Analytics: Funnel events (view product, add to cart, start checkout, pay), conversion and AOV dashboards.
+- Accessibility: Message template readability; web pages WCAG AA where applicable.
+- Documentation: Keep docs and DeveloperLog updated per PR.
+
+Backlog (Post-MVP)
+- Add Tamara/Tabby/Mada adapters behind payment gateway.
+- Product recommendations; upsell flows; inventory webhooks.
+- SLA auto-remediation; smarter NLP intents.
+
+== 0020: GitHub Work Items Bootstrap Script ==
+- Added `scripts/bootstrap-github-work-items.ps1` to create 6 sprint milestones and issues from `docs/backlog.md` via GitHub REST API.
+- Usage: set `GITHUB_TOKEN` (repo scope). Dry run: `pwsh scripts/bootstrap-github-work-items.ps1 -DryRun`. Create with start date: `-StartDate YYYY-MM-DD`.
+- Repo detection: infers `owner/repo` from `git remote origin`; override with `-Owner/-Repo`.
+- Also added usage block to `docs/backlog.md`.
+
+== 0021: Label Scaffolding & Auto-Triage ==
+- Enhanced `scripts/bootstrap-github-work-items.ps1` to auto-create labels and tag issues by keyword rules (area + role labels).
+- Labels include: backend, frontend, infra, qa, docs, whatsapp, catalog, cart, checkout, payments, orders, returns, cms, observability, performance, security, i18n.
+- Updated docs/backlog.md with a Labels note.
+
+== 0022: Sprint Process - Issues & Milestones ==
+- At sprint planning: create/update milestone "Sprint N" dates and generate/update issues from docs/backlog.md using scripts/bootstrap-github-work-items.ps1 (run with -DryRun first).
+- During sprint: keep labels current, link PRs to issues, and split blockers into separate issues.
+- Sprint review: close done issues, roll spillover to the next sprint milestone, and verify milestone due dates.
+- After review: update this DeveloperLog with a brief sprint summary and KPI snapshot (Conversion, AOV, funnel drop-off, first-reply time).
+- One-shot command (no policy change needed): powershell -NoProfile -ExecutionPolicy Bypass -File scripts\bootstrap-github-work-items.ps1 -StartDate YYYY-MM-DD
+- Auth: set GITHUB_TOKEN (PAT with repo scope) in the environment before running the script.
