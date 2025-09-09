@@ -14,7 +14,7 @@ function getRedisConnection(): Redis | null {
     // Fail fast in serverless; avoid long hangs/retries
     maxRetriesPerRequest: 1,
     enableReadyCheck: false,
-    connectTimeout: 5000,
+    connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 8000),
     // ioredis auto-enables TLS for rediss, but be explicit
     tls: isTls ? {} : undefined,
   } as RedisOptions;
@@ -42,22 +42,25 @@ export class QueueHealthController {
     const redis = getRedisConnection();
     let q: Queue | undefined;
     try {
+      const pingTimeoutMs = Number(process.env.REDIS_PING_TIMEOUT_MS || 8000);
       const pong = await Promise.race([
         (redis as Redis).ping(),
-        new Promise<string>((_, reject) => setTimeout(() => reject(new Error('ping timeout')), 4000)),
+        new Promise<string>((_, reject) => setTimeout(() => reject(new Error('ping timeout')), pingTimeoutMs)),
       ]);
       q = getQueue('whatsapp', redis as Redis);
       const counts = await q.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
+      const u = new URL(process.env.REDIS_URL as string);
       return {
         ok: pong === 'PONG',
         redis: pong,
+        endpoint: `${u.protocol}//${u.hostname}:${u.port}`,
         queues: { whatsapp: counts },
       };
     } catch (err: any) {
-      throw new HttpException(
-        { statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: `Redis error: ${err?.message || err}` },
-        HttpStatus.SERVICE_UNAVAILABLE,
-      );
+      const u = (() => { try { return new URL(process.env.REDIS_URL as string); } catch { return null; } })();
+      const ep = u ? `${u.protocol}//${u.hostname}:${u.port}` : undefined;
+      const msg = `Redis error: ${err?.message || err}${ep ? ` (endpoint ${ep})` : ''}`;
+      throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: msg }, HttpStatus.SERVICE_UNAVAILABLE);
     } finally {
       try { if (q) await q.close(); } catch {}
       try { await (redis as Redis).quit(); } catch {}
