@@ -306,3 +306,9 @@ Backlog (Post-MVP)
 - Ensured Prisma client is generated before TypeScript build (scripts:build runs prisma generate first) to fix missing delegate types in CI.
 - File: packages/api/package.json.
 
+
+
+== 0034: Vercel Prisma Generate ==
+- Added postinstall script in packages/api to run prisma generate during Vercel install to fix '@prisma/client did not initialize yet' runtime error.
+- Ensure Vercel API project uses pnpm and installs deps (postinstall runs).
+
