@@ -293,3 +293,10 @@ Backlog (Post-MVP)
 - Added scripts/sprint1-smoke.ps1 to validate health, CORS, WA verify/ingest, Consent API, and queue health.
 - Parameters: -ApiBase, -WebOrigin, -VerifyToken, -WaAppSecret, -TestPhone, -SkipSignature, -SkipQueue.
 
+
+
+== 0032: Serverless Bootstrap Hardening ==
+- Disabled Prisma () on module init to prevent Vercel cold-start crashes when DB is unreachable/misconfigured.
+- DB connections are established lazily on first query; healthz/verify no longer depend on DB.
+- File: packages/api/src/prisma/prisma.service.ts.
+
