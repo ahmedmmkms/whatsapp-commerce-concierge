@@ -5,9 +5,13 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
 import { requestIdMiddleware } from './common/request-id.middleware.js';
 import { LoggingInterceptor } from './common/logging.interceptor.js';
+import * as Sentry from '@sentry/node';
 
 export async function createApp() {
   const app = await NestFactory.create(AppModule);
+  if (process.env.SENTRY_DSN) {
+    Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.0 });
+  }
   // Capture rawBody for webhook signature verification (e.g., WhatsApp/Stripe)
   app.use(
     json({

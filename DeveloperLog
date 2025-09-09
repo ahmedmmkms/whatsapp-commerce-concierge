@@ -277,3 +277,19 @@ Backlog (Post-MVP)
 - Tuned ioredis options for Upstash/serverless: maxRetriesPerRequest=1, enableReadyCheck=false, connectTimeout=5s, TLS for rediss, 4s ping timeout.
 - /queue/health now fails fast with clearer 503s instead of long retry errors.
 
+
+
+== 0030: Sprint 1 Completion ==
+- Added Prisma module/service and persisted Customer/Conversation on WA ingest.
+- Added Consent API: POST /consents, GET /consents/:phone (PDPL baseline).
+- Added initial SQL migration under prisma/migrations for CI deploy.
+- Added Sentry init (optional via SENTRY_DSN).
+- Added e2e test for GET verify; fixed Jest ESM resolver and dist ignore.
+- Adjusted Whatsapp POST to return 200 and not 201.
+
+
+
+== 0031: Sprint 1 Smoke Script ==
+- Added scripts/sprint1-smoke.ps1 to validate health, CORS, WA verify/ingest, Consent API, and queue health.
+- Parameters: -ApiBase, -WebOrigin, -VerifyToken, -WaAppSecret, -TestPhone, -SkipSignature, -SkipQueue.
+

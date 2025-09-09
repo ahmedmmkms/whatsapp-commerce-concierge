@@ -1,9 +1,11 @@
-import { Controller, Get, Headers, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Headers, HttpCode, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { computeSignature, signaturesMatch } from './signature.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Controller('/webhook/whatsapp')
 export class WhatsappController {
+  constructor(private readonly prisma: PrismaService) {}
   @Get()
   verify(@Query('hub.mode') mode: string, @Query('hub.verify_token') token: string, @Query('hub.challenge') challenge: string, @Res() res: Response) {
     const expected = process.env.WHATSAPP_VERIFY_TOKEN || 'changeme';
@@ -14,7 +16,8 @@ export class WhatsappController {
   }
 
   @Post()
-  receive(
+  @HttpCode(HttpStatus.OK)
+  async receive(
     @Req() req: Request,
     @Headers('x-hub-signature-256') signature?: string,
   ) {
@@ -50,8 +53,22 @@ export class WhatsappController {
       }
     }
 
-    // TODO: enqueue processing job (BullMQ) in Sprint 1 task
-    // For now, log a minimal summary (stdout)
+    // Persist minimal entities: upsert customer and ensure a conversation record
+    // Note: keep synchronous for Sprint 1; move to queue in later sprints
+    for (const msg of messages) {
+      if (!msg.from) continue;
+      const customer = await this.prisma.customer.upsert({
+        where: { waPhone: msg.from },
+        update: { waName: undefined },
+        create: { waPhone: msg.from },
+      });
+      await this.prisma.conversation.upsert({
+        where: { customerId: customer.id },
+        update: { lastMessageAt: new Date() },
+        create: { customerId: customer.id, lastMessageAt: new Date() },
+      });
+    }
+
     // eslint-disable-next-line no-console
     console.log('[wa:webhook] messages', { count: messages.length });
 
