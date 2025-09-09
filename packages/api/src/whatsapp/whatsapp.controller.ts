@@ -55,18 +55,24 @@ export class WhatsappController {
 
     // Persist minimal entities: upsert customer and ensure a conversation record
     // Note: keep synchronous for Sprint 1; move to queue in later sprints
-    for (const msg of messages) {
-      if (!msg.from) continue;
-      const customer = await this.prisma.customer.upsert({
-        where: { waPhone: msg.from },
-        update: { waName: undefined },
-        create: { waPhone: msg.from },
-      });
-      await this.prisma.conversation.upsert({
-        where: { customerId: customer.id },
-        update: { lastMessageAt: new Date() },
-        create: { customerId: customer.id, lastMessageAt: new Date() },
-      });
+    try {
+      for (const msg of messages) {
+        if (!msg.from) continue;
+        const customer = await this.prisma.customer.upsert({
+          where: { waPhone: msg.from },
+          update: { waName: undefined },
+          create: { waPhone: msg.from },
+        });
+        await this.prisma.conversation.upsert({
+          where: { customerId: customer.id },
+          update: { lastMessageAt: new Date() },
+          create: { customerId: customer.id, lastMessageAt: new Date() },
+        });
+      }
+    } catch (err) {
+      // Do not fail webhook ack on DB issues; log and continue
+      // eslint-disable-next-line no-console
+      console.error('[wa:webhook] persist error', err);
     }
 
     // eslint-disable-next-line no-console
