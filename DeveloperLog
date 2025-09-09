@@ -271,3 +271,9 @@ Backlog (Post-MVP)
 - Ensured BullMQ queue/Redis connections close cleanly in serverless.
 - Files: packages/api/src/queue/queueHealth.controller.ts.
 
+
+
+== 0029: Redis Options for Serverless ==
+- Tuned ioredis options for Upstash/serverless: maxRetriesPerRequest=1, enableReadyCheck=false, connectTimeout=5s, TLS for rediss, 4s ping timeout.
+- /queue/health now fails fast with clearer 503s instead of long retry errors.
+

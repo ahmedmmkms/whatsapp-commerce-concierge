@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
-import type { Redis } from 'ioredis';
+import type { Redis, RedisOptions } from 'ioredis';
 
 function getRedisConnection(): Redis | null {
   const url = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -9,7 +9,16 @@ function getRedisConnection(): Redis | null {
     // In serverless/prod, missing REDIS_URL will fail; let caller handle
     return null;
   }
-  return new (IORedis as any)(url) as Redis;
+  const isTls = url.startsWith('rediss://');
+  const options: RedisOptions = {
+    // Fail fast in serverless; avoid long hangs/retries
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+    connectTimeout: 5000,
+    // ioredis auto-enables TLS for rediss, but be explicit
+    tls: isTls ? {} : undefined,
+  } as RedisOptions;
+  return new (IORedis as any)(url, options) as Redis;
 }
 
 function getQueue(name: string, connection: Redis) {
@@ -33,7 +42,10 @@ export class QueueHealthController {
     const redis = getRedisConnection();
     let q: Queue | undefined;
     try {
-      const pong = await (redis as Redis).ping();
+      const pong = await Promise.race([
+        (redis as Redis).ping(),
+        new Promise<string>((_, reject) => setTimeout(() => reject(new Error('ping timeout')), 4000)),
+      ]);
       q = getQueue('whatsapp', redis as Redis);
       const counts = await q.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
       return {
