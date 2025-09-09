@@ -9,7 +9,7 @@ function getRedisConnection(): Redis | null {
     // In serverless/prod, missing REDIS_URL will fail; let caller handle
     return null;
   }
-  const isTls = url.startsWith('redis://');
+  const isTls = url.startsWith('rediss://');
   const options: RedisOptions = {
     // Fail fast in serverless; avoid long hangs/retries
     maxRetriesPerRequest: 1,
