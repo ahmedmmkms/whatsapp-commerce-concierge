@@ -312,3 +312,14 @@ Backlog (Post-MVP)
 - Added postinstall script in packages/api to run prisma generate during Vercel install to fix '@prisma/client did not initialize yet' runtime error.
 - Ensure Vercel API project uses pnpm and installs deps (postinstall runs).
 
+== 0035: Sprint 1 — Completed ==
+- Status: All Sprint 1 smoke tests PASS on Vercel API (production-first); CURL CORS check confirmed.
+- WhatsApp Webhook: GET verify echoes challenge; POST ingest validates X-Hub-Signature-256 (optional via WHATSAPP_APP_SECRET), returns 200 ack, parses messages, logs count, and (best-effort) persists Customer/Conversation.
+- Data & Migrations: Prisma schema (Customer, Conversation unique per customer, Consent); initial migration checked in; CI workflow deploys schema to Neon; Prisma client generation on CI and Vercel (postinstall + build).
+- Consent (PDPL): POST /consents to capture consent + audit; GET /consents/:phone to retrieve history; validation via class-validator; error-safe responses.
+- Redis/BullMQ: Queue health endpoint with serverless-safe ioredis options (TLS for rediss, IPv4, low retries, timeouts); clear 503 diagnostics; redis URL sanitization.
+- Observability: Request IDs + request duration logging; /healthz (uptime/timestamp), /db/health (lazy DB ping), optional Sentry init (SENTRY_DSN).
+- Security/Perf: CORS tightened via CORS_ORIGINS; global rate limiting (Throttler); rawBody capture for HMAC verification; CORS 500 fix.
+- Serverless/Infra: Vercel catch-all function for Nest; vercel.json stable builder; pnpm workspace; CI (build/test) + db-deploy on main/tags.
+- Tooling/Scripts: scripts/test-whatsapp-webhook.ps1 (signed POST tester); scripts/sprint1-smoke.ps1 (E2E smoke for health/CORS/verify/webhook/consents/queue).
+- Notes: Background job worker & full event enqueue scheduled for Sprint 2; Catalog/browse flow starts next sprint.
