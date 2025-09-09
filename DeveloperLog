@@ -258,3 +258,16 @@ Backlog (Post-MVP)
 - Adjusted CORS origin callback to return false for disallowed origins instead of throwing (prevents 500 on Vercel).
 - File: packages/api/src/main.ts; reminder to set CORS_ORIGINS to your web URL(s).
 
+
+
+== 0027: WhatsApp Webhook Test Script ==
+- Added scripts/test-whatsapp-webhook.ps1 to send signed WhatsApp-style POST using HttpClient (UTF-8, no BOM).
+- Parameters: -Url, -Secret, -From, -Text, -MessageId, -BodyPath, -SkipSignature.
+
+
+
+== 0028: Queue Health Hardening ==
+- /queue/health now returns 503 with a clear message when REDIS_URL is missing and wraps Redis errors.
+- Ensured BullMQ queue/Redis connections close cleanly in serverless.
+- Files: packages/api/src/queue/queueHealth.controller.ts.
+
