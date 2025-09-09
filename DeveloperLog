@@ -252,3 +252,9 @@ Backlog (Post-MVP)
 - Added docs/neon-setup.md with production-first Neon instructions (pooler, roles, Prisma params, CI).
 - Linked guide from sprint-0-runbook no-Docker section.
 
+
+
+== 0026: CORS 500 Fix ==
+- Adjusted CORS origin callback to return false for disallowed origins instead of throwing (prevents 500 on Vercel).
+- File: packages/api/src/main.ts; reminder to set CORS_ORIGINS to your web URL(s).
+

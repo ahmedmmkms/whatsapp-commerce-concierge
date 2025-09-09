@@ -28,8 +28,9 @@ export async function createApp() {
     : defaultOrigins;
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-      else callback(new Error('Not allowed by CORS'));
+      // Do not error on disallowed origins; just omit CORS headers
+      const ok = !origin || allowedOrigins.includes(origin);
+      callback(null, ok);
     },
     credentials: true,
   });
