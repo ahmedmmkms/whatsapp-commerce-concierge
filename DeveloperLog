@@ -300,3 +300,9 @@ Backlog (Post-MVP)
 - DB connections are established lazily on first query; healthz/verify no longer depend on DB.
 - File: packages/api/src/prisma/prisma.service.ts.
 
+
+
+== 0033: CI Build Fix ==
+- Ensured Prisma client is generated before TypeScript build (scripts:build runs prisma generate first) to fix missing delegate types in CI.
+- File: packages/api/package.json.
+
