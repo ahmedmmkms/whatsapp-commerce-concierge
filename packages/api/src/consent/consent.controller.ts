@@ -1,11 +1,24 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 class UpsertConsentDto {
+  @IsString()
   phone!: string;
+
+  @IsBoolean()
   granted!: boolean;
+
+  @IsOptional()
+  @IsString()
   channel?: string; // default whatsapp
+
+  @IsOptional()
+  @IsString()
   policyText?: string;
+
+  @IsOptional()
+  @IsString()
   policyVersion?: string;
 }
 

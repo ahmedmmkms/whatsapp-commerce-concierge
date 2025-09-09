@@ -45,7 +45,7 @@ param(
   [Parameter(Mandatory = $true)][string]$WebOrigin,
   [Parameter(Mandatory = $true)][string]$VerifyToken,
   [string]$WaAppSecret,
-  [string]$TestPhone = '15551234567',
+  [string]$TestPhone = '15551791554',
   [switch]$SkipSignature,
   [switch]$SkipQueue
 )
