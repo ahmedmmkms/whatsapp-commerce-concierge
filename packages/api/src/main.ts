@@ -3,12 +3,38 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
+import { requestIdMiddleware } from './common/request-id.middleware.js';
+import { LoggingInterceptor } from './common/logging.interceptor.js';
 
 export async function createApp() {
   const app = await NestFactory.create(AppModule);
-  app.use(json({ limit: '1mb' }));
-  app.enableCors({ origin: true, credentials: true });
+  // Capture rawBody for webhook signature verification (e.g., WhatsApp/Stripe)
+  app.use(
+    json({
+      limit: '1mb',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      verify: (req: any, _res, buf) => {
+        // Preserve raw body for HMAC verification
+        req.rawBody = buf;
+      },
+    }),
+  );
+  app.use(requestIdMiddleware as any);
+  // CORS: allow specific origins via CORS_ORIGINS (comma-separated), else localhost:3000 by default
+  const originsEnv = process.env.CORS_ORIGINS;
+  const defaultOrigins = ['http://localhost:3000'];
+  const allowedOrigins = originsEnv
+    ? originsEnv.split(',').map((s) => s.trim()).filter(Boolean)
+    : defaultOrigins;
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+      else callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalInterceptors(new LoggingInterceptor());
   // For serverless usage, initialize the app without listening on a port
   await app.init();
   return app;

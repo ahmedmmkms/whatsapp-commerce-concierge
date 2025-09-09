@@ -1,0 +1,50 @@
+name: db-deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  prisma-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Validate DATABASE_URL
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "DATABASE_URL secret not set. Add it in repo settings." >&2
+            exit 1
+          fi
+
+      - name: Generate Prisma Client
+        run: pnpm -C packages/api prisma:generate
+
+      - name: Deploy migrations (or push schema on first run)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d packages/api/prisma/migrations ] && [ "$(ls -A packages/api/prisma/migrations | wc -l)" -gt 0 ]; then
+            echo "Migrations found; running prisma migrate deploy"
+            pnpm -C packages/api prisma:migrate:deploy
+          else
+            echo "No migrations found; running prisma db push for initial schema"
+            pnpm -C packages/api db:push
+          fi
+

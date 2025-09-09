@@ -1,0 +1,53 @@
+// Prisma schema for WhatsApp Commerce Concierge API (Sprint 1)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id           String        @id @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // WhatsApp sender identifier (phone number in international format)
+  waPhone      String        @db.VarChar(32)
+  // Optional display name from WA profile
+  waName       String?       @db.VarChar(128)
+
+  conversations Conversation[]
+  consents      Consent[]
+
+  @@unique([waPhone])
+}
+
+model Conversation {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id])
+
+  // Optional: last message metadata
+  lastMessageAt DateTime?
+  state        String?    @db.VarChar(64)
+}
+
+model Consent {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now())
+
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id])
+
+  granted      Boolean
+  channel      String     @db.VarChar(32) // e.g., 'whatsapp'
+  policyText   String?    @db.Text
+  policyVersion String?   @db.VarChar(32)
+}
+
