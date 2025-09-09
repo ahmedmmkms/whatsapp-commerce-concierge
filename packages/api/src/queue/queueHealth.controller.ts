@@ -3,18 +3,32 @@ import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import type { Redis, RedisOptions } from 'ioredis';
 
+function sanitizeUrl(raw: string | undefined): { raw: string | undefined; value: string | null; u: URL | null } {
+  if (!raw) return { raw, value: null, u: null };
+  const trimmed = raw.trim().replace(/^"(.*)"$/, '$1'); // strip surrounding quotes if present
+  try {
+    const u = new URL(trimmed);
+    return { raw, value: trimmed, u };
+  } catch {
+    return { raw, value: trimmed, u: null };
+  }
+}
+
 function getRedisConnection(): Redis | null {
-  const url = process.env.REDIS_URL || 'redis://localhost:6379';
-  if (!process.env.REDIS_URL) {
+  const s = sanitizeUrl(process.env.REDIS_URL);
+  const url = s.value || 'redis://localhost:6379';
+  if (!s.value) {
     // In serverless/prod, missing REDIS_URL will fail; let caller handle
     return null;
   }
-  const isTls = url.startsWith('rediss://');
+  const isTls = s.u?.protocol === 'rediss:';
   const options: RedisOptions = {
     // Fail fast in serverless; avoid long hangs/retries
     maxRetriesPerRequest: 1,
     enableReadyCheck: false,
     connectTimeout: Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 8000),
+    // Prefer IPv4 to avoid some dual-stack latency issues
+    family: 4,
     // ioredis auto-enables TLS for rediss, but be explicit
     tls: isTls ? {} : undefined,
   } as RedisOptions;
@@ -49,15 +63,17 @@ export class QueueHealthController {
       ]);
       q = getQueue('whatsapp', redis as Redis);
       const counts = await q.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
-      const u = new URL(process.env.REDIS_URL as string);
+      const s = sanitizeUrl(process.env.REDIS_URL);
+      const u = s.u;
       return {
         ok: pong === 'PONG',
         redis: pong,
-        endpoint: `${u.protocol}//${u.hostname}:${u.port}`,
+        endpoint: u ? `${u.protocol}//${u.hostname}:${u.port}` : undefined,
         queues: { whatsapp: counts },
       };
     } catch (err: any) {
-      const u = (() => { try { return new URL(process.env.REDIS_URL as string); } catch { return null; } })();
+      const s = sanitizeUrl(process.env.REDIS_URL);
+      const u = s.u;
       const ep = u ? `${u.protocol}//${u.hostname}:${u.port}` : undefined;
       const msg = `Redis error: ${err?.message || err}${ep ? ` (endpoint ${ep})` : ''}`;
       throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: msg }, HttpStatus.SERVICE_UNAVAILABLE);
