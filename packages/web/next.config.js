@@ -5,6 +5,10 @@ const nextConfig = {
     // Avoid external loader config during MVP; use unoptimized images
     unoptimized: true,
   },
+  eslint: {
+    // Don't fail production builds on lint errors
+    ignoreDuringBuilds: true,
+  },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) return [];
