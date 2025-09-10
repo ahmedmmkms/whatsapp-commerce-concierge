@@ -9,7 +9,7 @@ export default function HomePage() {
         <div className="card">
           <div className="card-body">
             <h3 className="card-title">Fast</h3>
-            <p className="card-subtitle">P95 < 200ms for core routes</p>
+            <p className="card-subtitle">P95 ≤ 200ms for core routes</p>
           </div>
         </div>
         <div className="card">

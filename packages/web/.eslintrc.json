@@ -1,0 +1,25 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "plugins": ["react"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "settings": {
+    "react": { "version": "detect" }
+  },
+  "rules": {
+    "react/no-unescaped-entities": "error"
+  },
+  "ignorePatterns": [".next/**", "node_modules/**"]
+}
+
