@@ -1,3 +1,7 @@
+import '../styles/globals.css'
+import { I18nProvider } from '../components/i18n/provider'
+import { Header } from '../components/header'
+
 export const metadata = {
   title: 'WhatsApp Concierge',
   description: 'Conversational commerce MVP',
@@ -6,11 +10,18 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir={process.env.NEXT_PUBLIC_RTL === '1' ? 'rtl' : 'ltr'}>
-      <body>
-        <div style={{ padding: 12, background: '#f3f4f6', fontSize: 13 }}>
-          <a href="/">Home</a> | <a href="/products">Products</a> | RTL: {process.env.NEXT_PUBLIC_RTL === '1' ? 'on' : 'off'}
-        </div>
-        {children}
+      <body className="bg-background text-foreground">
+        <I18nProvider>
+          <Header />
+          <main className="container-page py-6">
+            {children}
+          </main>
+          <footer className="mt-12 border-t border-border">
+            <div className="container-page py-6 text-xs text-muted-foreground">
+              © {new Date().getFullYear()} AMM. All rights reserved.
+            </div>
+          </footer>
+        </I18nProvider>
       </body>
     </html>
   );

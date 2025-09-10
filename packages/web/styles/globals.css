@@ -1,3 +1,5 @@
+@import './theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,3 +7,35 @@
 html, body, #__next { height: 100%; }
 body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Noto Sans Arabic", sans-serif; }
 
+.container-page {
+  @apply container px-4 md:px-6;
+}
+
+.prose-title {
+  @apply text-2xl md:text-3xl font-semibold tracking-tight text-foreground;
+}
+
+.prose-subtle {
+  @apply text-sm text-muted-foreground;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none h-9 px-4 py-2;
+}
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:opacity-90;
+}
+.btn-outline {
+  @apply border border-border bg-transparent text-foreground hover:bg-muted;
+}
+
+.card {
+  @apply bg-card text-card-foreground rounded-lg border border-border shadow-card;
+}
+.card-body { @apply p-4; }
+.card-title { @apply text-lg font-semibold; }
+.card-subtitle { @apply text-sm text-muted-foreground; }
+
+.badge {
+  @apply inline-flex items-center rounded-md border border-transparent bg-muted text-muted-foreground px-2 py-0.5 text-xs font-medium;
+}
