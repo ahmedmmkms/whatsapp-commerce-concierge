@@ -335,3 +335,14 @@ Backlog (Post-MVP)
 - Tests: Sprint 2 smoke + feature scripts; acceptance runner (unit + E2E) added.
 - Ops: Vercel DI fix (export CatalogService); reduced Redis noise; /whatsapp/preview robust to body/query.
 - Tag/Release: to be created as 'sprint-2-finished' with title 'Sprint 2 fininshed'.
+
+
+== 0036: Sprint 3 Plan (Conversational Cart) ==
+- Scope: Cart service and endpoints (/cart, /cart/items CRUD with idempotency), Cart/CartItem models, WA cart flows (add/view/update/remove; AR/EN), pricing utils, shipping estimate stub.
+- Data: Cart(id, customerId, conversationId, status, currency, totals, version, expiresAt), CartItem(id, cartId, productId, sku, nameSnapshot, priceSnapshotMinor, currency, qty, lineTotalMinor).
+- API: POST/GET /cart; POST/PATCH/DELETE /cart/items; GET /cart/estimate-shipping; concurrency via transactions; Idempotency-Key header.
+- WhatsApp: intents for add/view/update/remove integrated into intent.service with Arabic/English templates; extend /whatsapp/preview to simulate.
+- Performance: P95 < 200ms for cart ops (cached catalog lookups), optimistic versioning.
+- Testing: Unit for CartService and utils; E2E for lifecycle/idempotency; concurrency tests; localized templates.
+- Docs/Scripts: Added docs/sprint-3-features.md; added scripts/sprint3-smoke.ps1 and scripts/sprint3/test-cart.ps1.
+- Next: create milestone "Sprint 3" and bootstrap GitHub issues from docs/backlog.md using scripts/bootstrap-github-work-items.ps1 (run with -DryRun first, then with -StartDate).
