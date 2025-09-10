@@ -54,3 +54,38 @@ Changelog Additions (Planned)
 - Added /cart endpoints with idempotency; shipping estimate stub.
 - Extended /whatsapp/preview to simulate cart flows (AR/EN).
 
+---
+
+WhatsApp Commands (Examples)
+- add: `add ABC-123`
+- cart: `cart`
+- update qty: `qty ABC-123 2`
+- remove: `remove ABC-123`
+- Preview: `POST /whatsapp/preview { from?: "+9715...", text: "add ABC-123", lang: "en" }`
+
+API Examples
+- Create/Get cart:
+  - `POST /cart` → `{ ok: true, cart: { id, currency, items: [] } }`
+  - `GET /cart` → `{ ok: true, cart: { id, items: [{ id, sku, qty, lineTotalMinor }], subtotalMinor, totalMinor } }`
+- Add item:
+  - `POST /cart/items` body: `{ productId: "pid-1", qty: 1 }` or `{ sku: "ABC-123", qty: 1 }`
+  - Optional header: `Idempotency-Key: <uuid>`
+  - Response: `{ ok: true, item: { id, sku, qty, lineTotalMinor } }`
+- Update qty:
+  - `PATCH /cart/items/:itemId` body: `{ qty: 2 }`
+- Remove item:
+  - `DELETE /cart/items/:itemId`
+- Shipping estimate:
+  - `GET /cart/estimate-shipping` → `{ ok: true, estimate: { currency, shippingMinor, freeThresholdMinor } }`
+
+Performance Notes
+- Indexes: `(CartItem.cartId, sku)` speeds qty/remove by SKU.
+- Shipping rules: Free over 100 (major units), otherwise flat 20.
+
+Testing Scripts
+- `scripts/sprint3-smoke.ps1` — cart lifecycle + estimate.
+- `scripts/sprint3/test-cart.ps1` — CRUD/idempotency.
+- `scripts/sprint3/test-wa-cart.ps1` — WA preview add/cart/qty/remove.
+
+Env Notes
+- Recommended: set `REDIS_URL` for idempotent `POST /cart/items` retries.
