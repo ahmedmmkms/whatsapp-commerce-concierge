@@ -21,6 +21,7 @@ model Customer {
 
   conversations Conversation[]
   consents      Consent[]
+  carts         Cart[]
 
   @@unique([waPhone])
 }
@@ -36,6 +37,7 @@ model Conversation {
   // Optional: last message metadata
   lastMessageAt DateTime?
   state        String?    @db.VarChar(64)
+  carts        Cart[]
 
   @@unique([customerId])
 }
@@ -90,6 +92,7 @@ model Product {
   category    Category?     @relation(fields: [categoryId], references: [id])
 
   media       ProductMedia[]
+  cartItems   CartItem[]
 
   @@index([categoryId])
   @@index([name])
@@ -118,4 +121,53 @@ model CatalogSyncLog {
   productsUpserted Int
   categoriesUpserted Int
   note         String?  @db.Text
+}
+
+// Sprint 3: Cart models
+
+model Cart {
+  id             String        @id @default(uuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  customerId     String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id])
+
+  status         String        @default("active") @db.VarChar(16) // active|abandoned|ordered
+  currency       String        @db.VarChar(8)
+  subtotalMinor  Int           @default(0)
+  taxMinor       Int           @default(0)
+  shippingMinor  Int           @default(0)
+  totalMinor     Int           @default(0)
+  version        Int           @default(0)
+  expiresAt      DateTime?
+
+  items          CartItem[]
+
+  @@index([customerId, status])
+}
+
+model CartItem {
+  id                 String   @id @default(uuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  cartId             String
+  cart               Cart     @relation(fields: [cartId], references: [id])
+
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id])
+
+  sku                String   @db.VarChar(64)
+  nameSnapshot       String   @db.VarChar(256)
+  priceSnapshotMinor Int
+  currency           String   @db.VarChar(8)
+  qty                Int
+  lineTotalMinor     Int      @default(0)
+
+  @@unique([cartId, productId])
+  @@index([cartId])
 }
