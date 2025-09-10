@@ -3,7 +3,8 @@ param(
   [string]$Owner,
   [string]$Repo,
   [string]$Token = $env:GITHUB_TOKEN,
-  [switch]$DryRun
+  [switch]$DryRun,
+  [int]$OnlySprint
 )
 
 $ErrorActionPreference = 'Stop'
@@ -45,9 +46,11 @@ function Get-OrCreateMilestone([string]$title, [string]$description, [datetime]$
   $existing = Invoke-RestMethod -Method GET -Uri "$base/milestones?state=all&per_page=100" -Headers $headers
   $match = $existing | Where-Object { $_.title -eq $title }
   if ($match) { return $match }
-  $body = @{ title = $title; state = 'open'; description = $description; due_on = ($dueOn.ToString('o')) } | ConvertTo-Json
+  # GitHub expects RFC3339 timestamp with Z (UTC), e.g., 2025-10-12T00:00:00Z
+  $dueUtc = $dueOn.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+  $body = @{ title = $title; state = 'open'; description = $description; due_on = $dueUtc } | ConvertTo-Json
   if ($DryRun) { Write-Host "[DRYRUN] Create milestone: $title (due $($dueOn.ToShortDateString()))"; return @{ number = -1; title = $title } }
-  return Invoke-RestMethod -Method POST -Uri "$base/milestones" -Headers $headers -Body $body
+  return Invoke-RestMethod -Method POST -Uri "$base/milestones" -Headers $headers -Body $body -ContentType 'application/json'
 }
 
 function Ensure-Issue([string]$title, [string]$body, [string[]]$labels, [int]$milestoneNumber) {
@@ -114,16 +117,26 @@ function Get-LabelsForWorkItem([string]$title, [string]$body) {
   return ($labels | Sort-Object -Unique)
 }
 
-# Plan: create 6 milestones of 2 weeks each
+# Plan: create milestones. If -OnlySprint set, limit to that sprint; else create 6.
 $start = Get-Date $StartDate
 $milestones = @{}
-for ($i = 1; $i -le 6; $i++) {
+if ($OnlySprint) {
+  $i = [int]$OnlySprint
   $sprintStart = $start.AddDays(14 * ($i - 1))
   $sprintEnd = $sprintStart.AddDays(13)
   $title = "Sprint $i"
   $desc = "P1 WhatsApp Commerce Concierge - $title ($($sprintStart.ToString('yyyy-MM-dd')) to $($sprintEnd.ToString('yyyy-MM-dd')))"
   $ms = Get-OrCreateMilestone -title $title -description $desc -dueOn $sprintEnd
   $milestones[$i] = $ms
+} else {
+  for ($i = 1; $i -le 6; $i++) {
+    $sprintStart = $start.AddDays(14 * ($i - 1))
+    $sprintEnd = $sprintStart.AddDays(13)
+    $title = "Sprint $i"
+    $desc = "P1 WhatsApp Commerce Concierge - $title ($($sprintStart.ToString('yyyy-MM-dd')) to $($sprintEnd.ToString('yyyy-MM-dd')))"
+    $ms = Get-OrCreateMilestone -title $title -description $desc -dueOn $sprintEnd
+    $milestones[$i] = $ms
+  }
 }
 
 # Parse docs/backlog.md
@@ -161,8 +174,9 @@ for ($idx = 0; $idx -lt $lines.Length; $idx++) {
 # Ensure labels exist
 foreach ($ls in $labelSpec) { Ensure-Label -name $ls.name -color $ls.color -description $ls.description | Out-Null }
 
-# Create issues under their respective milestones
+# Create issues under their respective milestones (filter if OnlySprint)
 foreach ($it in $issues) {
+  if ($OnlySprint -and ([int]$it.Sprint -ne [int]$OnlySprint)) { continue }
   $s = [int]$it.Sprint
   if (-not $milestones.ContainsKey($s)) { Write-Warning "No milestone for sprint $s"; continue }
   $msNum = $milestones[$s].number
@@ -171,4 +185,9 @@ foreach ($it in $issues) {
   Ensure-Issue -title $it.Title -body $it.Body -labels $labels -milestoneNumber $msNum | Out-Null
 }
 
-Write-Host "Done. Created/verified $($issues.Count) issues across 6 milestones for $Owner/$Repo"
+if ($OnlySprint) {
+  $count = ($issues | Where-Object { [int]$_.Sprint -eq [int]$OnlySprint }).Count
+  Write-Host "Done. Created/verified $count issues for Sprint $OnlySprint in $Owner/$Repo"
+} else {
+  Write-Host "Done. Created/verified $($issues.Count) issues across 6 milestones for $Owner/$Repo"
+}

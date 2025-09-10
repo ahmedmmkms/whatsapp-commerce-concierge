@@ -52,3 +52,60 @@ model Consent {
   policyText   String?    @db.Text
   policyVersion String?   @db.VarChar(32)
 }
+
+// Sprint 2: Catalog models
+
+model Category {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  name      String     @db.VarChar(128)
+  slug      String     @unique @db.VarChar(128)
+
+  parentId  String?
+  parent    Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryChildren")
+
+  products  Product[]
+}
+
+model Product {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  sku         String        @unique @db.VarChar(64)
+  name        String        @db.VarChar(256)
+  description String?
+  price       Int           // minor units (e.g., cents)
+  currency    String        @db.VarChar(8)
+  stock       Int           @default(0)
+  isActive    Boolean       @default(true)
+
+  brand       String?       @db.VarChar(64)
+  attributes  Json?
+
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+
+  media       ProductMedia[]
+
+  @@index([categoryId])
+  @@index([name])
+}
+
+model ProductMedia {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  url       String   @db.Text
+  kind      String   @db.VarChar(16) // image|video
+  sortOrder Int      @default(0)
+
+  @@index([productId])
+}

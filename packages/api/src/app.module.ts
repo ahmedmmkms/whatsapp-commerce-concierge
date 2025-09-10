@@ -6,6 +6,7 @@ import { StripeModule } from './stripe/stripe.module.js';
 import { QueueModule } from './queue/queue.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ConsentModule } from './consent/consent.module.js';
+import { CatalogModule } from './catalog/catalog.module.js';
 
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -19,6 +20,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     StripeModule,
     QueueModule,
     ConsentModule,
+    CatalogModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
