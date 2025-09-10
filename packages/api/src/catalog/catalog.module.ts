@@ -10,5 +10,6 @@ import { CacheModule } from '../cache/cache.module.js';
   imports: [PrismaModule, CacheModule],
   controllers: [ProductsController, CategoriesController, CatalogAdminController],
   providers: [CatalogService],
+  exports: [CatalogService],
 })
 export class CatalogModule {}
