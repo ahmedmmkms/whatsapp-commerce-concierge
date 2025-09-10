@@ -23,6 +23,18 @@ Testing
 - Unit: feed parser/upsert (next), query filters/sorts.
 - E2E: `/products`, `/products/:id`, `/categories` basic coverage.
 
+Test Scripts (PowerShell)
+- `scripts/sprint2-smoke.ps1` — full Sprint 2 smoke.
+- `scripts/sprint2/test-catalog-health.ps1` — health and counts.
+- `scripts/sprint2/test-products.ps1` — list/search/sort/page.
+- `scripts/sprint2/test-product-detail.ps1` — product by id.
+- `scripts/sprint2/test-categories.ps1` — categories list.
+- `scripts/sprint2/test-catalog-sync.ps1` — trigger sync (requires `CATALOG_SYNC_KEY`).
+
+Examples
+- `pwsh scripts/sprint2-smoke.ps1 -ApiBase https://<api>.vercel.app`
+- `pwsh scripts/sprint2/test-catalog-sync.ps1 -ApiBase https://<api>.vercel.app -CatalogSyncKey '<KEY>'`
+
 Notes
 - Env: `CATALOG_SYNC_KEY` (guard sync), `DEFAULT_CURRENCY` (future), `CATALOG_FEED_URL` (future).
 - Current commit includes Prisma models + API scaffolds; sync job to be implemented.
