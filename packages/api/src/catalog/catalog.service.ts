@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { demoFeed, type DemoCategory, type DemoProduct } from './demoFeed.js';
 
 export type ProductQuery = {
   q?: string;
@@ -89,5 +90,73 @@ export class CatalogService {
         return { createdAt: order } as const;
     }
   }
-}
 
+  async syncDemoFeed() {
+    // Upsert categories by slug
+    const catIdBySlug = new Map<string, string>();
+
+    // First pass: ensure categories exist (no parent linkage yet)
+    for (const c of demoFeed.categories) {
+      const existing = await this.prisma.category.findUnique({ where: { slug: c.slug } });
+      if (existing) {
+        const updated = await this.prisma.category.update({ where: { id: existing.id }, data: { name: c.name } });
+        catIdBySlug.set(c.slug, updated.id);
+      } else {
+        const created = await this.prisma.category.create({ data: { slug: c.slug, name: c.name } });
+        catIdBySlug.set(c.slug, created.id);
+      }
+    }
+
+    // Second pass: set parent relationships
+    for (const c of demoFeed.categories) {
+      if (!c.parentSlug) continue;
+      const id = catIdBySlug.get(c.slug);
+      const parentId = catIdBySlug.get(c.parentSlug);
+      if (id && parentId) {
+        await this.prisma.category.update({ where: { id }, data: { parentId } });
+      }
+    }
+
+    // Upsert products by sku
+    let productUpserts = 0;
+    for (const p of demoFeed.products) {
+      const categoryId = p.categorySlug ? catIdBySlug.get(p.categorySlug) : undefined;
+      const data = {
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        currency: p.currency,
+        stock: p.stock ?? 0,
+        brand: p.brand,
+        attributes: p.attributes as any,
+        categoryId,
+        isActive: true,
+      } as const;
+
+      const existing = await this.prisma.product.findUnique({ where: { sku: p.sku } });
+      let product;
+      if (existing) {
+        product = await this.prisma.product.update({ where: { sku: p.sku }, data });
+      } else {
+        product = await this.prisma.product.create({ data: { sku: p.sku, ...data } });
+      }
+      productUpserts++;
+      // Reset media
+      await this.prisma.productMedia.deleteMany({ where: { productId: product.id } });
+      if (p.media && p.media.length) {
+        await this.prisma.productMedia.createMany({
+          data: p.media.map((m, idx) => ({
+            productId: product.id,
+            url: m.url,
+            kind: (m.kind || 'image') as any,
+            sortOrder: m.sortOrder ?? idx,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
+    const counts = await this.counts();
+    return { ok: true, categories: demoFeed.categories.length, products: productUpserts, counts };
+  }
+}

@@ -12,7 +12,11 @@ if ($ApiBase.EndsWith('/')) { $ApiBase = $ApiBase.TrimEnd('/') }
 if (-not $ProductId) {
   $list = Invoke-WebRequest -UseBasicParsing -Method Get -Uri "$ApiBase/products?page=1&pageSize=1"
   if ($list.StatusCode -ne 200) { Fail "/products status $($list.StatusCode)" }
-  $ProductId = (($list.Content | ConvertFrom-Json).items | Select-Object -First 1).id
+  $obj = $list.Content | ConvertFrom-Json
+  if ($null -eq $obj.items -or $obj.items.Count -lt 1) {
+    Fail "No products returned from /products — seed or sync the catalog first."
+  }
+  $ProductId = ($obj.items | Select-Object -First 1).id
 }
 if (-not $ProductId) { Fail "No product id available" }
 $g = Invoke-WebRequest -UseBasicParsing -Method Get -Uri "$ApiBase/products/$ProductId"

@@ -17,8 +17,9 @@ export class CatalogAdminController {
     if (!this.isAuthorized(key)) {
       return { ok: false, error: 'forbidden' };
     }
-    // Stub: in future, enqueue a job to fetch and upsert the feed
-    return { ok: true, scheduled: true };
+    // For Sprint 2: sync from demo feed synchronously
+    const result = await this.catalog.syncDemoFeed();
+    return { ok: true, scheduled: false, result };
   }
 
   @Get('health')
@@ -31,4 +32,3 @@ export class CatalogAdminController {
     };
   }
 }
-
