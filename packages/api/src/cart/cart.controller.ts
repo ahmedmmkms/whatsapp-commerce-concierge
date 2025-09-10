@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post } from '@nestjs/common';
 import { CartService } from './cart.service.js';
 import { AddCartItemDto } from './dto/add-cart-item.dto.js';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto.js';
@@ -20,8 +20,8 @@ export class CartController {
   }
 
   @Post('items')
-  async addItem(@Body() dto: AddCartItemDto) {
-    const item = await this.cartService.addItem(dto);
+  async addItem(@Body() dto: AddCartItemDto, @Headers('idempotency-key') idempotencyKey?: string) {
+    const item = await this.cartService.addItem(dto, idempotencyKey);
     return { ok: true, item };
   }
 
@@ -43,4 +43,3 @@ export class CartController {
     return { ok: true, estimate };
   }
 }
-

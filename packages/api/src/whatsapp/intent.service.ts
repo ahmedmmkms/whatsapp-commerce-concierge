@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CatalogService } from '../catalog/catalog.service.js';
+import { CartService } from '../cart/cart.service.js';
 
 export type Lang = 'en' | 'ar';
 
 @Injectable()
 export class IntentService {
-  constructor(private readonly catalog: CatalogService) {}
+  constructor(private readonly catalog: CatalogService, private readonly cart: CartService) {}
 
   async handleText(text: string, lang: Lang = 'en') {
     const t = (text || '').trim();
@@ -20,6 +21,31 @@ export class IntentService {
       return [this.msg(lang, 'browseHeader'), { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
     }
 
+    // Cart add by sku
+    const addSku = this.parseAddSku(t, lang);
+    if (addSku) {
+      const found = await this.catalog.listProducts({ q: addSku, page: 1, pageSize: 1 });
+      const p = found.items[0];
+      if (!p) return [this.msg(lang, 'notFound')];
+      await this.cart.addItem({ sku: p.sku || undefined, productId: p.id, qty: 1 });
+      const price = (p.price / 100).toFixed(2) + ' ' + (p.currency || 'USD');
+      const replies = [
+        { title: this.tr(lang, 'cart'), payload: 'cart' },
+        { title: this.tr(lang, 'browse'), payload: 'browse' },
+      ];
+      return [{ type: 'text', text: `Added: ${p.name} (${price})` }, { type: 'quick_replies', replies }];
+    }
+
+    // Cart view
+    if (this.isCart(t, lang)) {
+      const c = await this.cart.getCart();
+      if (!c.items?.length) return [{ type: 'text', text: this.tr(lang, 'cartEmpty') }];
+      const lines = c.items.map((it: any) => `• ${it.nameSnapshot} x${it.qty} — ${(it.lineTotalMinor / 100).toFixed(2)} ${c.currency}`);
+      const replies = [{ title: this.tr(lang, 'browse'), payload: 'browse' }];
+      return [{ type: 'text', text: this.tr(lang, 'cartHeader') }, { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
+    }
+
+    // Product details by sku
     const detailsSku = this.parseDetailsSku(t, lang);
     if (detailsSku) {
       const res = await this.catalog.listProducts({ q: detailsSku, page: 1, pageSize: 1 });
@@ -32,6 +58,7 @@ export class IntentService {
       return [...img, textMsg, this.msg(lang, 'detailsFooter')];
     }
 
+    // Category show/more flows
     const show = this.parseShowCategory(t, lang);
     if (show) {
       const page = show.page || 1;
@@ -49,11 +76,7 @@ export class IntentService {
         ...(res.items[0]?.sku ? [{ title: this.tr(lang, 'details') + ' ' + res.items[0].sku, payload: `details ${res.items[0].sku}` }] : []),
         { title: this.tr(lang, 'browse'), payload: 'browse' },
       ];
-      return [
-        this.msg(lang, 'categoryHeader', show.slug),
-        { type: 'text', text: lines.join('\n') },
-        { type: 'quick_replies', replies },
-      ];
+      return [this.msg(lang, 'categoryHeader', show.slug), { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
     }
 
     const more = this.parseMore(t, lang);
@@ -73,11 +96,7 @@ export class IntentService {
         ...(res.items[0]?.sku ? [{ title: this.tr(lang, 'details') + ' ' + res.items[0].sku, payload: `details ${res.items[0].sku}` }] : []),
         { title: this.tr(lang, 'browse'), payload: 'browse' },
       ];
-      return [
-        this.msg(lang, 'categoryHeader', more.slug),
-        { type: 'text', text: lines.join('\n') },
-        { type: 'quick_replies', replies },
-      ];
+      return [this.msg(lang, 'categoryHeader', more.slug), { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
     }
 
     // Fallback: try search
@@ -94,22 +113,28 @@ export class IntentService {
   }
 
   private isBrowse(t: string, lang: Lang) {
-    return /\b(browse|categories)\b/i.test(t) || (lang === 'ar' && /(تصفح|الأقسام)/.test(t));
+    return /\b(browse|categories)\b/i.test(t) || (lang === 'ar' && /(���|��竟�)/.test(t));
+  }
+  private isCart(t: string, lang: Lang) {
+    return /\b(cart)\b/i.test(t) || (lang === 'ar' && /(����)/.test(t));
+  }
+  private parseAddSku(t: string, lang: Lang) {
+    const m = t.match(/^add\s+(\S+)/i) || (lang === 'ar' ? t.match(/^(���)\s+(\S+)/) : null);
+    return m ? (m[1] || m[2]) : '';
   }
   private parseDetailsSku(t: string, lang: Lang) {
-    const m = t.match(/^(details|detail)\s+(\S+)/i) || (lang === 'ar' ? t.match(/^(تفاصيل)\s+(\S+)/) : null);
+    const m = t.match(/^(details|detail)\s+(\S+)/i) || (lang === 'ar' ? t.match(/^(�埭��)\s+(\S+)/) : null);
     return m ? m[2] : '';
   }
   private parseShowCategory(t: string, lang: Lang): { slug: string; page?: number } | null {
-    const m = t.match(/^show\s+(\S+)(?:\s+page\s+(\d+))?/i) || (lang === 'ar' ? t.match(/^عرض\s+(\S+)(?:\s+صفحة\s+(\d+))?/) : null);
+    const m = t.match(/^show\s+(\S+)(?:\s+page\s+(\d+))?/i) || (lang === 'ar' ? t.match(/^��\s+(\S+)(?:\s+�奡\s+(\d+))?/) : null);
     if (!m) return null;
     const slug = (m[1] || '').toLowerCase();
     const page = m[2] ? Math.max(1, parseInt(m[2], 10)) : undefined;
     return { slug, page };
   }
-
   private parseMore(t: string, lang: Lang): { slug: string; page?: number } | null {
-    const m = t.match(/^more(?:\s+(\S+))?(?:\s+page\s+(\d+))?/i) || (lang === 'ar' ? t.match(/^المزيد(?:\s+(\S+))?(?:\s+صفحة\s+(\d+))?/) : null);
+    const m = t.match(/^more(?:\s+(\S+))?(?:\s+page\s+(\d+))?/i) || (lang === 'ar' ? t.match(/^����(?:\s+(\S+))?(?:\s+�奡\s+(\d+))?/) : null);
     if (!m) return null;
     const slug = (m[1] || '').toLowerCase();
     const page = m[2] ? Math.max(1, parseInt(m[2], 10)) : undefined;
@@ -129,22 +154,23 @@ export class IntentService {
       help: { type: 'text', text: 'Try: "browse", "show <category>", or "details <sku>".' },
     } as const;
     const ar = {
-      empty: { type: 'text', text: 'اكتب "تصفح" لعرض الأقسام أو "تفاصيل <sku>".' },
-      browseHeader: { type: 'text', text: 'الأقسام:' },
-      notFound: { type: 'text', text: 'لا توجد نتائج.' },
-      detailsFooter: { type: 'text', text: 'اكتب "add <sku>" لإضافة للسلة، أو "تصفح".' },
-      categoryHeader: { type: 'text', text: `الأكثر شيوعًا في القسم: ${arg || ''}` },
-      morePrompt: { type: 'text', text: 'اكتب "more <category>" للمزيد، أو "تفاصيل <sku>".' },
-      searchHeader: { type: 'text', text: `نتائج البحث عن "${arg || ''}":` },
-      help: { type: 'text', text: 'جرّب: "تصفح"، "عرض <category>"، أو "تفاصيل <sku>".' },
+      empty: { type: 'text', text: '�袠 "���" ��� ��竟� �� "�埭�� <sku>".' },
+      browseHeader: { type: 'text', text: '��竟�:' },
+      notFound: { type: 'text', text: '� ���� 뢟��.' },
+      detailsFooter: { type: 'text', text: '�袠 "add <sku>" ���� ���? �� "���".' },
+      categoryHeader: { type: 'text', text: `��裩 ����� �� ����: ${arg || ''}` },
+      morePrompt: { type: 'text', text: '�袠 "more <category>" ����? �� "�埭�� <sku>".' },
+      searchHeader: { type: 'text', text: `뢟�� �頥� �� "${arg || ''}":` },
+      help: { type: 'text', text: '����: "���"? "�� <category>"? �� "�埭�� <sku>".' },
     } as const;
     const dict = lang === 'ar' ? ar : en;
     return dict[key as keyof typeof dict] || dict.help;
   }
 
-  private tr(lang: Lang, key: 'more' | 'details' | 'browse') {
-    const en = { more: 'more', details: 'details', browse: 'browse' };
-    const ar = { more: 'المزيد', details: 'تفاصيل', browse: 'تصفح' };
+  private tr(lang: Lang, key: 'more' | 'details' | 'browse' | 'cart' | 'cartEmpty' | 'cartHeader') {
+    const en = { more: 'more', details: 'details', browse: 'browse', cart: 'cart', cartEmpty: 'Your cart is empty.', cartHeader: 'Your cart:' };
+    const ar = { more: '����', details: '�埭��', browse: '���', cart: '����', cartEmpty: '������� ���.', cartHeader: '�������:' };
     return (lang === 'ar' ? ar : en)[key];
   }
 }
+
