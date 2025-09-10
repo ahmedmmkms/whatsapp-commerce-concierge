@@ -16,7 +16,8 @@ export class IntentService {
       const cats = await this.catalog.listCategories();
       const top = cats.filter((c: any) => !c.parentId).slice(0, 6);
       const lines = top.map((c: any) => `• ${c.name}`);
-      return [this.msg(lang, 'browseHeader'), { type: 'text', text: lines.join('\n') }];
+      const replies = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
+      return [this.msg(lang, 'browseHeader'), { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
     }
 
     const detailsSku = this.parseDetailsSku(t, lang);
@@ -35,7 +36,13 @@ export class IntentService {
     if (show) {
       const page = show.page || 1;
       const res = await this.catalog.listProducts({ category: show.slug, page, pageSize: 5, sort: 'name', order: 'asc' });
-      if (!res.items.length) return [this.msg(lang, 'notFound')];
+      if (!res.items.length) {
+        const cats = await this.catalog.listCategories();
+        const top = cats.filter((c: any) => !c.parentId).slice(0, 6);
+        const repliesNF = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
+        repliesNF.unshift({ title: this.tr(lang, 'browse'), payload: 'browse' });
+        return [this.msg(lang, 'notFound'), { type: 'quick_replies', replies: repliesNF }];
+      }
       const lines = res.items.map((p: any) => `• ${p.name} (${(p.price / 100).toFixed(2)} ${p.currency}) [${p.sku || p.id}]`);
       const replies = [
         { title: this.tr(lang, 'more'), payload: `show ${show.slug} page ${page + 1}` },
@@ -53,7 +60,13 @@ export class IntentService {
     if (more) {
       const page = more.page || 2;
       const res = await this.catalog.listProducts({ category: more.slug, page, pageSize: 5, sort: 'name', order: 'asc' });
-      if (!res.items.length) return [this.msg(lang, 'notFound')];
+      if (!res.items.length) {
+        const cats = await this.catalog.listCategories();
+        const top = cats.filter((c: any) => !c.parentId).slice(0, 6);
+        const repliesNF = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
+        repliesNF.unshift({ title: this.tr(lang, 'browse'), payload: 'browse' });
+        return [this.msg(lang, 'notFound'), { type: 'quick_replies', replies: repliesNF }];
+      }
       const lines = res.items.map((p: any) => `• ${p.name} (${(p.price / 100).toFixed(2)} ${p.currency}) [${p.sku || p.id}]`);
       const replies = [
         { title: this.tr(lang, 'more'), payload: `show ${more.slug} page ${page + 1}` },
@@ -73,7 +86,11 @@ export class IntentService {
       const lines = res.items.map((p: any) => `• ${p.name} (${(p.price / 100).toFixed(2)} ${p.currency})`);
       return [this.msg(lang, 'searchHeader', t), { type: 'text', text: lines.join('\n') }];
     }
-    return [this.msg(lang, 'help')];
+    const cats = await this.catalog.listCategories();
+    const top = cats.filter((c: any) => !c.parentId).slice(0, 6);
+    const repliesNF = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
+    repliesNF.unshift({ title: this.tr(lang, 'browse'), payload: 'browse' });
+    return [this.msg(lang, 'help'), { type: 'quick_replies', replies: repliesNF }];
   }
 
   private isBrowse(t: string, lang: Lang) {

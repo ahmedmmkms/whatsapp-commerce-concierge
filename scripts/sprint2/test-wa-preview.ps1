@@ -10,6 +10,25 @@ function Ok([string]$m){ Write-Host "+ $m" -ForegroundColor Green }
 function Fail([string]$m){ Write-Host "x $m" -ForegroundColor Red; exit 1 }
 
 if ($ApiBase.EndsWith('/')) { $ApiBase = $ApiBase.TrimEnd('/') }
+
+# If asking to show a category that may not exist, map to a valid category from /categories
+if ($Text -match '^(?i)show\s+(\S+)(?:\s+page\s+\d+)?$') {
+  $cat = $Matches[1]
+  try {
+    $c = Invoke-WebRequest -UseBasicParsing -Method Get -Uri "$ApiBase/categories"
+    if ($c.StatusCode -eq 200) {
+      $co = $c.Content | ConvertFrom-Json
+      $cats = @($co.categories)
+      $exists = $false
+      foreach ($x in $cats) { if ($x.slug -eq $cat -or $x.name -eq $cat) { $exists = $true; break } }
+      if (-not $exists -and $cats.Count -gt 0) {
+        $firstTop = $cats | Where-Object { -not $_.parentId } | Select-Object -First 1
+        if ($null -eq $firstTop) { $firstTop = $cats[0] }
+        if ($firstTop) { $Text = "show $($firstTop.slug)" }
+      }
+    }
+  } catch {}
+}
 $body = @{ text = $Text; lang = $Lang } | ConvertTo-Json -Compress
 $res = Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$ApiBase/whatsapp/preview" -ContentType 'application/json' -Body $body
 if ($res.StatusCode -ne 200) { Fail "/whatsapp/preview status $($res.StatusCode)" }
