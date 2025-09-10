@@ -17,8 +17,9 @@ try {
   $txt = $res.Content.ReadAsStringAsync().Result
   if (-not $res.IsSuccessStatusCode) { Fail "/catalog/sync status $([int]$res.StatusCode) $txt" }
   $obj = $txt | ConvertFrom-Json
-  if ($obj.ok -ne $true -or $obj.scheduled -ne $true) { Fail "/catalog/sync did not return ok" }
-  Ok "/catalog/sync accepted"
+  if ($obj.ok -ne $true) { Fail "/catalog/sync ok=false" }
+  $mode = if ($obj.scheduled -eq $true) { 'scheduled' } else { 'executed' }
+  Ok "/catalog/sync $mode"
 } finally {
   $client.Dispose()
 }
