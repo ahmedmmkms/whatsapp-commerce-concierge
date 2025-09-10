@@ -1,4 +1,4 @@
-# MVP Sprint Plan — WhatsApp Commerce Concierge (P1)
+# MVP Sprint Plan ï¿½ WhatsApp Commerce Concierge (P1)
 
 Cadence: 2-week sprints, 6 total (12 weeks)
 Team: PM, Tech Lead (Node), 1 FE, 1 BE, 1 QA, 0.5 DevOps
@@ -7,7 +7,7 @@ KPIs (from Sprint 2): Conversion, AOV, chat funnel drop?off, first?reply time
 NFRs: PDPL consent, PCI-aware via gateway, 99.9% SLA, P95 API < 300ms
 Risks: WA onboarding delays ? sandbox; payments risk ? COD + one provider; free-tier quotas
 
-## Sprint 1 (Weeks 1–2): WA Webhook, Core Dialog, Foundations
+## Sprint 1 (Weeks 1ï¿½2): WA Webhook, Core Dialog, Foundations
 Goals
 - Stabilize WhatsApp webhook verify/ingest; lay base conversation loop.
 - Stand up DB (Neon) + Redis (Upstash) + BullMQ; choose ORM and migrations.
@@ -21,7 +21,7 @@ QA/Perf
 - Unit tests for webhook verification; load test ~50 RPS P95 < 200ms.
 - Security review of token handling and consent storage.
 
-## Sprint 2 (Weeks 3–4): Catalog Sync + Browse
+## Sprint 2 (Weeks 3ï¿½4): Catalog Sync + Browse
 Goals
 - Implement catalog ingestion and search; enable conversational browse in WA.
 Deliverables
@@ -33,7 +33,7 @@ QA/Perf
 - Playwright smoke for browse intents; stock/price consistency checks.
 - P95 product lookup < 150ms (cached), warm Redis keys.
 
-## Sprint 3 (Weeks 5–6): Conversational Cart
+## Sprint 3 (Weeks 5ï¿½6): Conversational Cart
 Goals
 - Add cart creation/persistence and line-item ops via chat.
 Deliverables
@@ -45,7 +45,18 @@ QA/Perf
 - Unit/E2E for cart ops; concurrency tests; localized templates.
 - P95 cart ops < 200ms; Redis caching for catalog.
 
-## Sprint 4 (Weeks 7–8): Checkout (COD + Stripe)
+## Sprint 4 (Weeks 7â€“8): Web Frontend MVP
+Goals
+- Deliver a polished, lightweight web front end to complement WA flows.
+Deliverables
+- Web: Home/landing, categories, product list/detail (media, specs), Arabic/English + RTL.
+- Handoff: â€œChat to Orderâ€ WhatsApp deeplinks with prefilled product context.
+- Search/Filters: Client-side search and simple filters (category, price).
+- Analytics: Events for product views and handoff clicks.
+QA/Perf
+- Lighthouse/Core Web Vitals pass; i18n/RTL verification; route load P95 < 200ms.
+
+## Sprint 5 (Weeks 9â€“10): Checkout (COD + Stripe)
 Goals
 - Implement checkout with COD baseline and Stripe card (test).
 Deliverables
@@ -54,10 +65,10 @@ Deliverables
 - WA flows: address/notes collection, payment handoff link (Stripe), COD confirmation.
 - Compliance: PCI-aware (provider redirect), PDPL consent replay on checkout.
 QA/Perf
-- E2E browse ? cart ? checkout (COD and Stripe test); retry-safe payments.
+- E2E browse â†’ cart â†’ checkout (COD and Stripe test); retry-safe payments.
 - P95 checkout init < 250ms (excluding provider redirect).
 
-## Sprint 5 (Weeks 9–10): Orders, Tracking, Returns, Basic CMS
+## Sprint 6 (Weeks 11â€“12): Orders, Tracking, Returns, Basic CMS
 Goals
 - Expose order status, returns ticketing, and operator content controls.
 Deliverables
@@ -69,7 +80,7 @@ QA/Perf
 - Playwright E2E for order status and returns; Arabic RTL content review.
 - Ops runbooks and on-call alerts for failed jobs/webhooks.
 
-## Sprint 6 (Weeks 11–12): Hardening, UAT, Pilot Go-Live
+## Sprint 7 (Weeks 13â€“14): Hardening, UAT, Pilot Go-Live
 Goals
 - Close NFRs, observability, and readiness; execute UAT and pilot.
 Deliverables
@@ -77,7 +88,7 @@ Deliverables
 - Reliability: Circuit breakers, retries/backoff, DLQs; backup/restore drills.
 - Security/Compliance: PDPL data export/delete, consent logs, privacy notices; checklist sign-off.
 - Ops: Dashboards (SLA, P95, funnel), alerts, runbooks; incident templates.
-- Docs: OpenAPI finalized; support SOP; WhatsApp number migration playbook.
+- Docs: API OpenAPI finalized; support SOP; WhatsApp number migration playbook.
 QA/Acceptance
 - UAT pass; rollback tested; pilot launch via feature flags.
 
