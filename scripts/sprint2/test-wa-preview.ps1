@@ -8,6 +8,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 function Ok([string]$m){ Write-Host "+ $m" -ForegroundColor Green }
 function Fail([string]$m){ Write-Host "x $m" -ForegroundColor Red; exit 1 }
+function Info([string]$m){ Write-Host "  $m" -ForegroundColor DarkGray }
 
 if ($ApiBase.EndsWith('/')) { $ApiBase = $ApiBase.TrimEnd('/') }
 
@@ -36,10 +37,23 @@ $o = $res.Content | ConvertFrom-Json
 if ($o.ok -ne $true -or $null -eq $o.messages) { Fail "/whatsapp/preview invalid response" }
 Ok "/whatsapp/preview ok (messages=$($o.messages.Count))"
 
+# Summarize message types for easier debugging
+$types = @()
+foreach ($m in $o.messages) { $types += ($m.type ?? 'text') }
+Info "types: $($types -join ', ')"
+
 # Additional checks for show/more flows
 if ($Text -match 'show\s+\S+' -or $Text -match 'more\s+\S+') {
   $hasReplies = $false
   foreach ($m in $o.messages) { if ($m.type -eq 'quick_replies') { $hasReplies = $true; break } }
-  if (-not $hasReplies) { Fail "Expected quick replies in response" }
+  if (-not $hasReplies) {
+    $sample = ''
+    try {
+      $first = $o.messages | Select-Object -First 1
+      if ($first.type -eq 'text' -and $first.text) { $sample = $first.text }
+    } catch {}
+    Info "sample: $sample"
+    Fail "Expected quick replies in response. Hint: category may be empty or API not updated. Try 'browse' or a category from /categories."
+  }
   Ok "quick replies present"
 }

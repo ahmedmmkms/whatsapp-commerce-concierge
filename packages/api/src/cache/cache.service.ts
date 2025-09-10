@@ -7,14 +7,33 @@ export class CacheService implements OnModuleDestroy {
   private enabled = false;
   private hits = 0;
   private misses = 0;
+  private errors = 0;
+  private warned = false;
 
   constructor() {
+    if (process.env.CACHE_DISABLED === '1') {
+      this.enabled = false;
+      return;
+    }
     const url = process.env.REDIS_URL; // expect standard Redis URL
     if (url) {
-      this.client = new IORedis(url, { lazyConnect: true, maxRetriesPerRequest: 2 });
+      this.client = new IORedis(url, {
+        lazyConnect: true,
+        maxRetriesPerRequest: 0,
+        connectTimeout: 3000,
+        retryStrategy: (times) => Math.min(times * 200, 1000),
+      });
+      this.client.on('error', (err) => {
+        this.errors++;
+        // Avoid noisy unhandled error; log once with hint for operators
+        if (!this.warned) {
+          this.warned = true;
+          // eslint-disable-next-line no-console
+          console.warn('[cache] Redis connection issue; caching will be skipped. Set REDIS_URL or set CACHE_DISABLED=1 to suppress.', String(err?.message || err));
+        }
+      });
       this.enabled = true;
-      // Try connecting in background
-      this.client.connect().catch(() => { /* ignore */ });
+      // Do not eagerly connect in serverless; operations will attempt when used
     }
   }
 
@@ -50,6 +69,6 @@ export class CacheService implements OnModuleDestroy {
   }
 
   metrics() {
-    return { enabled: this.enabled, hits: this.hits, misses: this.misses };
+    return { enabled: this.enabled && !!this.client, hits: this.hits, misses: this.misses, errors: this.errors };
   }
 }
