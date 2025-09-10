@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { WhatsappController } from './whatsapp.controller.js';
+import { WhatsappPreviewController } from './preview.controller.js';
+import { IntentService } from './intent.service.js';
+import { CatalogModule } from '../catalog/catalog.module.js';
 
 @Module({
-  controllers: [WhatsappController],
+  imports: [CatalogModule],
+  controllers: [WhatsappController, WhatsappPreviewController],
+  providers: [IntentService],
 })
 export class WhatsappModule {}
-

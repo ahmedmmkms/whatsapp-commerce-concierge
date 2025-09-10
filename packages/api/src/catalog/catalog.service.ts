@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { CacheService } from '../cache/cache.service.js';
 import { demoFeed, type DemoCategory, type DemoProduct } from './demoFeed.js';
 
 export type ProductQuery = {
@@ -15,7 +16,7 @@ export type ProductQuery = {
 
 @Injectable()
 export class CatalogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly cache: CacheService) {}
 
   async listProducts(params: ProductQuery) {
     const page = Math.max(1, params.page || 1);
@@ -42,6 +43,10 @@ export class CatalogService {
       where.category = { slug: params.category };
     }
 
+    const cacheKey = this.keyForList(where, orderBy, page, pageSize);
+    const cached = await this.cache.get<any>(cacheKey);
+    if (cached) return cached;
+
     const [total, items] = await this.prisma.$transaction([
       this.prisma.product.count({ where }),
       this.prisma.product.findMany({
@@ -53,7 +58,9 @@ export class CatalogService {
       }),
     ]);
 
-    return { total, page, pageSize, items };
+    const result = { total, page, pageSize, items };
+    await this.cache.set(cacheKey, result, 600);
+    return result;
   }
 
   async getProduct(id: string) {
@@ -64,10 +71,15 @@ export class CatalogService {
   }
 
   async listCategories() {
-    return this.prisma.category.findMany({
+    const cacheKey = 'cat:list:v1';
+    const cached = await this.cache.get<any[]>(cacheKey);
+    if (cached) return cached as any;
+    const r = await this.prisma.category.findMany({
       orderBy: [{ parentId: 'asc' }, { name: 'asc' }],
       include: { _count: { select: { products: true, children: true } }, parent: true },
     });
+    await this.cache.set(cacheKey, r, 1800);
+    return r;
   }
 
   async counts() {
@@ -156,7 +168,25 @@ export class CatalogService {
       }
     }
 
+    // Invalidate/warm caches
+    await this.cache.set('cat:list:v1', undefined as any, 1);
+    await this.listCategories().catch(() => undefined);
+    await this.listProducts({ page: 1, pageSize: 20, sort: 'newest', order: 'desc' }).catch(() => undefined);
+
     const counts = await this.counts();
+    try {
+      await this.prisma.catalogSyncLog.create({ data: {
+        ok: true,
+        productsUpserted: productUpserts,
+        categoriesUpserted: demoFeed.categories.length,
+        note: 'demo-feed',
+      } });
+    } catch {}
     return { ok: true, categories: demoFeed.categories.length, products: productUpserts, counts };
+  }
+
+  private keyForList(where: any, orderBy: any, page: number, pageSize: number) {
+    const base = JSON.stringify({ where, orderBy, page, pageSize });
+    return 'p:q:' + Buffer.from(base).toString('base64url');
   }
 }

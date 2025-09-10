@@ -44,3 +44,11 @@ Seeding Sample Electronics Data
 Notes
 - Env: `CATALOG_SYNC_KEY` (guard sync), `DEFAULT_CURRENCY` (future), `CATALOG_FEED_URL` (future).
 - Current commit includes Prisma models + API scaffolds; demo sync implemented; dedicated electronics seeding script added.
+
+Additional Test Scripts
+- `scripts/sprint2/test-wa-preview.ps1` — preview WA browse intents (AR/EN) without sending messages.
+
+Changelog Additions
+- Added WA intent preview endpoint (`POST /whatsapp/preview`).
+- Added Redis caching for catalog queries and warm-up after sync.
+- Added nightly sync GitHub Action (`.github/workflows/catalog-nightly-sync.yml`).

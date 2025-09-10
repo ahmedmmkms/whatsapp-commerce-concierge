@@ -109,3 +109,13 @@ model ProductMedia {
 
   @@index([productId])
 }
+
+// Sync status/logs for catalog
+model CatalogSyncLog {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  ok           Boolean
+  productsUpserted Int
+  categoriesUpserted Int
+  note         String?  @db.Text
+}

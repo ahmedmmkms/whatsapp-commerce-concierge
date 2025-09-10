@@ -25,10 +25,12 @@ export class CatalogAdminController {
   @Get('health')
   async health() {
     const counts = await this.catalog.counts();
-    return {
-      ok: true,
-      counts,
-      lastSyncAt: null, // placeholder until sync job stores status
-    };
+    // pull last sync from DB if present
+    let lastSyncAt: string | null = null;
+    try {
+      const latest = await (this.catalog as any).prisma.catalogSyncLog.findFirst({ orderBy: { createdAt: 'desc' } });
+      if (latest?.createdAt) lastSyncAt = new Date(latest.createdAt).toISOString();
+    } catch {}
+    return { ok: true, counts, lastSyncAt };
   }
 }
