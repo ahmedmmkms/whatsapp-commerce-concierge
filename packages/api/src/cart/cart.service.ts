@@ -14,7 +14,7 @@ export class CartService {
   private async ensureContext(waPhone?: string) {
     // Bind cart to real WA sender when provided; fallback to preview when absent
     const phone = waPhone || 'preview';
-    let customer = await this.prisma.customer.findUnique({ where: { waPhone } });
+    let customer = await this.prisma.customer.findUnique({ where: { waPhone: phone } });
     if (!customer) {
       customer = await this.prisma.customer.create({ data: { waPhone: phone, waName: waPhone ? undefined : 'Preview' } });
     }
