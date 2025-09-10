@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CatalogService } from './catalog.service.js';
 
 @Controller('/products')
@@ -13,11 +13,13 @@ export class ProductsController {
     @Query('maxPrice') maxPriceRaw?: string,
     @Query('sort') sort?: 'price' | 'name' | 'newest',
     @Query('order') order?: 'asc' | 'desc',
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page') pageRaw?: string,
+    @Query('pageSize') pageSizeRaw?: string,
   ) {
     const minPrice = this.toInt(minPriceRaw);
     const maxPrice = this.toInt(maxPriceRaw);
+    const page = this.toInt(pageRaw);
+    const pageSize = this.toInt(pageSizeRaw);
     return this.catalog.listProducts({ q, category, minPrice, maxPrice, sort, order, page, pageSize });
   }
 
@@ -34,4 +36,3 @@ export class ProductsController {
     return Number.isFinite(n) ? Math.trunc(n) : undefined;
   }
 }
-
