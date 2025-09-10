@@ -1,6 +1,7 @@
 import ProductsClient from '../../components/products-client'
 
 async function getApiBase() {
+  if (process.env.NEXT_PUBLIC_API_URL) return '/api'
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
 }
 
@@ -13,15 +14,22 @@ async function getProducts(searchParams: { [key: string]: string | string[] | un
   if (typeof searchParams.priceMax === 'string') qp.set('priceMax', searchParams.priceMax)
   qp.set('page', '1')
   qp.set('pageSize', '20')
-  const res = await fetch(`${base}/products?${qp.toString()}`, { cache: 'no-store' })
-  return res.json()
+  try {
+    const res = await fetch(`${base}/products?${qp.toString()}`, { cache: 'no-store' })
+    if (!res.ok) return { items: [], total: 0 }
+    return await res.json()
+  } catch (e) {
+    console.error('getProducts failed', e)
+    return { items: [], total: 0 }
+  }
 }
 
 async function getCategories() {
   const base = await getApiBase()
   try {
     const res = await fetch(`${base}/categories`, { cache: 'no-store' })
-    return res.json()
+    if (!res.ok) return { items: [] }
+    return await res.json()
   } catch {
     return { items: [] }
   }

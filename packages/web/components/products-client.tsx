@@ -49,7 +49,17 @@ export default function ProductsClient({ items, categories, q, category, priceMi
           <input type="number" name="priceMax" placeholder={t('products.priceMax')} defaultValue={priceMax} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
         </div>
       </form>
-
+      {items.length === 0 && (
+        <div className="card mb-6">
+          <div className="card-body">
+            <h3 className="card-title">{t('products.empty.title')}</h3>
+            <p className="card-subtitle mt-1">{t('products.empty.subtitle')}</p>
+            <div className="mt-3">
+              <a className="btn btn-outline" href="/products">{t('products.back')}</a>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((p: any) => {
           const img = p.media?.[0]?.url as string | undefined
@@ -78,4 +88,3 @@ export default function ProductsClient({ items, categories, q, category, priceMi
     </div>
   )
 }
-

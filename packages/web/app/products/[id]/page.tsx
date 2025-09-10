@@ -3,13 +3,20 @@ import { ChatToOrderButton } from '../../../components/chat-to-order-button'
 import { BackToProductsButton } from '../../../components/back-to-products-button'
 
 async function getApiBase() {
+  if (process.env.NEXT_PUBLIC_API_URL) return '/api'
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
 }
 
 async function getProduct(id: string) {
   const base = await getApiBase()
-  const res = await fetch(`${base}/products/${id}`, { cache: 'no-store' })
-  return res.json()
+  try {
+    const res = await fetch(`${base}/products/${id}`, { cache: 'no-store' })
+    if (!res.ok) return { product: null }
+    return await res.json()
+  } catch (e) {
+    console.error('getProduct failed', e)
+    return { product: null }
+  }
 }
 
 export default async function ProductDetail({ params }: { params: { id: string } }) {
