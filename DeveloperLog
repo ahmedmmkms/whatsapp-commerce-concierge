@@ -346,3 +346,13 @@ Backlog (Post-MVP)
 - Testing: Unit for CartService and utils; E2E for lifecycle/idempotency; concurrency tests; localized templates.
 - Docs/Scripts: Added docs/sprint-3-features.md; added scripts/sprint3-smoke.ps1 and scripts/sprint3/test-cart.ps1.
 - Next: create milestone "Sprint 3" and bootstrap GitHub issues from docs/backlog.md using scripts/bootstrap-github-work-items.ps1 (run with -DryRun first, then with -StartDate).
+
+== 0037: Sprint 3 — Completed (Conversational Cart) ==
+- Status: All Sprint 3 smoke tests PASS on staging API. Unit/E2E tests green.
+- Data & Migrations: Added Cart and CartItem models; migrations deployed; added index on (cartId, sku) for update/remove by SKU.
+- API: /cart create/get; /cart/items (POST upsert with Idempotency-Key, PATCH qty, DELETE remove); /cart/estimate-shipping (free >100, else flat 20).
+- WA Intents: add <sku>, cart, qty <sku> <n>, remove <sku>; intents bind to real WA sender in webhook and preview.
+- Scripts: scripts/sprint3-smoke.ps1 (lifecycle), scripts/sprint3/test-cart.ps1 (idempotency), scripts/sprint3/test-wa-cart.ps1 (WA flows).
+- Observability/Perf: kept Redis cache for idempotency; added index; P95 target < 200ms for cart ops (validated spot checks).
+- Docs: docs/sprint-3-features.md updated with WA command examples, API examples, perf notes.
+- Tag/Release: prepare tag 'sprint-3-finished' with title 'Sprint 3 finished' after merging to main.
