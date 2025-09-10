@@ -2,10 +2,12 @@ import { Controller, Get, Headers, HttpCode, HttpException, HttpStatus, Post, Qu
 import type { Request, Response } from 'express';
 import { computeSignature, signaturesMatch } from './signature.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { IntentService } from './intent.service.js';
+import { WhatsappSenderService } from './sender.service.js';
 
 @Controller('/webhook/whatsapp')
 export class WhatsappController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly intents: IntentService, private readonly sender: WhatsappSenderService) {}
   @Get()
   verify(@Query('hub.mode') mode: string, @Query('hub.verify_token') token: string, @Query('hub.challenge') challenge: string, @Res() res: Response) {
     const expected = process.env.WHATSAPP_VERIFY_TOKEN || 'changeme';
@@ -68,6 +70,18 @@ export class WhatsappController {
           update: { lastMessageAt: new Date() },
           create: { customerId: customer.id, lastMessageAt: new Date() },
         });
+
+        // Feature-flagged auto-reply: generate preview messages and send via Cloud API
+        if (process.env.WHATSAPP_SEND_ENABLED === '1' && msg.text) {
+          try {
+            const lang = 'en';
+            const out = await this.intents.handleText(msg.text, lang as any);
+            await this.sender.sendBatch(msg.from, out as any);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('[wa:auto-reply] failed', e);
+          }
+        }
       }
     } catch (err) {
       // Do not fail webhook ack on DB issues; log and continue

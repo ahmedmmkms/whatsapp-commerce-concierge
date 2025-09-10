@@ -32,6 +32,6 @@ export class CatalogAdminController {
       const latest = await (this.catalog as any).prisma.catalogSyncLog.findFirst({ orderBy: { createdAt: 'desc' } });
       if (latest?.createdAt) lastSyncAt = new Date(latest.createdAt).toISOString();
     } catch {}
-    return { ok: true, counts, lastSyncAt, cache: this.cache.metrics() };
+    return { ok: true, counts, lastSyncAt, cache: this.cache.metrics(), catalog: this.catalog.metrics() };
   }
 }

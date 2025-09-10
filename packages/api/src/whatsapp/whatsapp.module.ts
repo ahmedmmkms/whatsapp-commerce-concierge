@@ -3,10 +3,11 @@ import { WhatsappController } from './whatsapp.controller.js';
 import { WhatsappPreviewController } from './preview.controller.js';
 import { IntentService } from './intent.service.js';
 import { CatalogModule } from '../catalog/catalog.module.js';
+import { WhatsappSenderService } from './sender.service.js';
 
 @Module({
   imports: [CatalogModule],
   controllers: [WhatsappController, WhatsappPreviewController],
-  providers: [IntentService],
+  providers: [IntentService, WhatsappSenderService],
 })
 export class WhatsappModule {}

@@ -16,6 +16,7 @@ export type ProductQuery = {
 
 @Injectable()
 export class CatalogService {
+  private timings = { productsLastMs: 0, categoriesLastMs: 0, productsAvgMs: 0, categoriesAvgMs: 0, samples: 0 };
   constructor(private readonly prisma: PrismaService, private readonly cache: CacheService) {}
 
   async listProducts(params: ProductQuery) {
@@ -47,6 +48,7 @@ export class CatalogService {
     const cached = await this.cache.get<any>(cacheKey);
     if (cached) return cached;
 
+    const t0 = Date.now();
     const [total, items] = await this.prisma.$transaction([
       this.prisma.product.count({ where }),
       this.prisma.product.findMany({
@@ -57,6 +59,10 @@ export class CatalogService {
         include: { media: { orderBy: { sortOrder: 'asc' }, take: 1 }, category: true },
       }),
     ]);
+    const dt = Date.now() - t0;
+    this.timings.productsLastMs = dt;
+    this.timings.samples += 1;
+    this.timings.productsAvgMs = Math.round(((this.timings.productsAvgMs * (this.timings.samples - 1)) + dt) / this.timings.samples);
 
     const result = { total, page, pageSize, items };
     await this.cache.set(cacheKey, result, 600);
@@ -74,10 +80,15 @@ export class CatalogService {
     const cacheKey = 'cat:list:v1';
     const cached = await this.cache.get<any[]>(cacheKey);
     if (cached) return cached as any;
+    const t0 = Date.now();
     const r = await this.prisma.category.findMany({
       orderBy: [{ parentId: 'asc' }, { name: 'asc' }],
       include: { _count: { select: { products: true, children: true } }, parent: true },
     });
+    const dt = Date.now() - t0;
+    this.timings.categoriesLastMs = dt;
+    this.timings.samples += 1;
+    this.timings.categoriesAvgMs = Math.round(((this.timings.categoriesAvgMs * (this.timings.samples - 1)) + dt) / this.timings.samples);
     await this.cache.set(cacheKey, r, 1800);
     return r;
   }
@@ -89,6 +100,10 @@ export class CatalogService {
       this.prisma.productMedia.count(),
     ]);
     return { products, categories, media };
+  }
+
+  metrics() {
+    return { timings: this.timings };
   }
 
   private mapOrder(sort: string, order: 'asc' | 'desc') {
