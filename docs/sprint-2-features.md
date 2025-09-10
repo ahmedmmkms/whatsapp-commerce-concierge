@@ -35,6 +35,12 @@ Examples
 - `pwsh scripts/sprint2-smoke.ps1 -ApiBase https://<api>.vercel.app`
 - `pwsh scripts/sprint2/test-catalog-sync.ps1 -ApiBase https://<api>.vercel.app -CatalogSyncKey '<KEY>'`
 
+Seeding Sample Electronics Data
+- Local DB (DATABASE_URL must point to your Postgres):
+  - `pnpm -C packages/api run db:seed:electronics`
+  - Or: `cd packages/api && node scripts/seed-electronics.mjs`
+- After seeding, rerun the smoke tests with `-ExpectData`.
+
 Notes
 - Env: `CATALOG_SYNC_KEY` (guard sync), `DEFAULT_CURRENCY` (future), `CATALOG_FEED_URL` (future).
-- Current commit includes Prisma models + API scaffolds; sync job to be implemented.
+- Current commit includes Prisma models + API scaffolds; demo sync implemented; dedicated electronics seeding script added.
