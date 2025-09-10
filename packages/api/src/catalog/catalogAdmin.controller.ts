@@ -1,9 +1,10 @@
 import { Controller, Get, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { CatalogService } from './catalog.service.js';
+import { CacheService } from '../cache/cache.service.js';
 
 @Controller('/catalog')
 export class CatalogAdminController {
-  constructor(private readonly catalog: CatalogService) {}
+  constructor(private readonly catalog: CatalogService, private readonly cache: CacheService) {}
 
   private isAuthorized(key?: string) {
     const expected = process.env.CATALOG_SYNC_KEY;
@@ -31,6 +32,6 @@ export class CatalogAdminController {
       const latest = await (this.catalog as any).prisma.catalogSyncLog.findFirst({ orderBy: { createdAt: 'desc' } });
       if (latest?.createdAt) lastSyncAt = new Date(latest.createdAt).toISOString();
     } catch {}
-    return { ok: true, counts, lastSyncAt };
+    return { ok: true, counts, lastSyncAt, cache: this.cache.metrics() };
   }
 }

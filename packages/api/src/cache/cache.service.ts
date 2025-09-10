@@ -5,6 +5,8 @@ import IORedis, { Redis } from 'ioredis';
 export class CacheService implements OnModuleDestroy {
   private client?: Redis;
   private enabled = false;
+  private hits = 0;
+  private misses = 0;
 
   constructor() {
     const url = process.env.REDIS_URL; // expect standard Redis URL
@@ -22,8 +24,14 @@ export class CacheService implements OnModuleDestroy {
     if (!this.client) return undefined;
     try {
       const v = await this.client.get(key);
-      return v ? (JSON.parse(v) as T) : undefined;
+      if (v) {
+        this.hits++;
+        return JSON.parse(v) as T;
+      }
+      this.misses++;
+      return undefined;
     } catch {
+      this.misses++;
       return undefined;
     }
   }
@@ -39,5 +47,9 @@ export class CacheService implements OnModuleDestroy {
 
   async onModuleDestroy() {
     if (this.client) await this.client.quit();
+  }
+
+  metrics() {
+    return { enabled: this.enabled, hits: this.hits, misses: this.misses };
   }
 }

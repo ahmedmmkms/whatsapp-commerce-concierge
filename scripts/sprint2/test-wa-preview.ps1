@@ -16,3 +16,11 @@ if ($res.StatusCode -ne 200) { Fail "/whatsapp/preview status $($res.StatusCode)
 $o = $res.Content | ConvertFrom-Json
 if ($o.ok -ne $true -or $null -eq $o.messages) { Fail "/whatsapp/preview invalid response" }
 Ok "/whatsapp/preview ok (messages=$($o.messages.Count))"
+
+# Additional checks for show/more flows
+if ($Text -match 'show\s+\S+' -or $Text -match 'more\s+\S+') {
+  $hasReplies = $false
+  foreach ($m in $o.messages) { if ($m.type -eq 'quick_replies') { $hasReplies = $true; break } }
+  if (-not $hasReplies) { Fail "Expected quick replies in response" }
+  Ok "quick replies present"
+}
