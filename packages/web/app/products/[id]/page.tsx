@@ -1,4 +1,6 @@
 import Image from 'next/image'
+import { ChatToOrderButton } from '../../../components/chat-to-order-button'
+import { BackToProductsButton } from '../../../components/back-to-products-button'
 
 async function getApiBase() {
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
@@ -31,31 +33,11 @@ export default async function ProductDetail({ params }: { params: { id: string }
       {p.description && (<p className="prose-subtle mt-2">{p.description}</p>)}
 
       <div className="mt-6 flex gap-3">
-        {/* Client i18n label */}
-        {/* @ts-expect-error Server Component passing props to Client Component */}
-        <(await import('../../../components/chat-to-order-button')).ChatToOrderButton
-          productId={p.id}
-          name={p.name}
-          currency={p.currency}
-          priceMinor={p.price}
-        />
-        {/* @ts-expect-error Server Component using client i18n for label */}
+        <ChatToOrderButton productId={p.id} name={p.name} currency={p.currency} priceMinor={p.price} />
         <BackToProductsButton />
       </div>
     </div>
   )
 }
 
-// Client-only label for back link
-function BackToProductsButton() {
-  // @ts-expect-error dynamic import in server component
-  return <(async () => {
-    const { useI18n } = await import('../../../components/i18n/provider')
-    const { IconArrowLeft } = await import('../../../components/icons')
-    const Comp = () => {
-      const { t } = useI18n()
-      return <a className="btn btn-outline" href="/products"><IconArrowLeft className="mr-2 inline" />{t('products.back')}</a>
-    }
-    return <Comp />
-  }) />
-}
+// (BackToProductsButton is a client component imported above)
