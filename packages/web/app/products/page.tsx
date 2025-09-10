@@ -10,8 +10,8 @@ async function getProducts(searchParams: { [key: string]: string | string[] | un
   const qp = new URLSearchParams()
   if (typeof searchParams.q === 'string') qp.set('q', searchParams.q)
   if (typeof searchParams.category === 'string') qp.set('category', searchParams.category)
-  if (typeof searchParams.priceMin === 'string') qp.set('priceMin', searchParams.priceMin)
-  if (typeof searchParams.priceMax === 'string') qp.set('priceMax', searchParams.priceMax)
+  if (typeof searchParams.minPrice === 'string') qp.set('minPrice', searchParams.minPrice)
+  if (typeof searchParams.maxPrice === 'string') qp.set('maxPrice', searchParams.maxPrice)
   qp.set('page', '1')
   qp.set('pageSize', '20')
   try {
@@ -38,11 +38,11 @@ async function getCategories() {
 export default async function ProductsPage({ searchParams }: { searchParams: any }) {
   const [data, cats] = await Promise.all([getProducts(searchParams), getCategories()])
   const items = data.items || []
-  const categories = cats.items || []
+  const categories = cats.categories || cats.items || []
   const q = typeof searchParams.q === 'string' ? searchParams.q : ''
   const category = typeof searchParams.category === 'string' ? searchParams.category : ''
-  const priceMin = typeof searchParams.priceMin === 'string' ? searchParams.priceMin : ''
-  const priceMax = typeof searchParams.priceMax === 'string' ? searchParams.priceMax : ''
+  const priceMin = typeof searchParams.minPrice === 'string' ? searchParams.minPrice : ''
+  const priceMax = typeof searchParams.maxPrice === 'string' ? searchParams.maxPrice : ''
   return (
     <ProductsClient
       items={items}

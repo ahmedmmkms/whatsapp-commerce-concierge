@@ -41,12 +41,12 @@ export default function ProductsClient({ items, categories, q, category, priceMi
         >
           <option value="">{t('products.all')}</option>
           {categories.map((c: any) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+            <option key={c.id || c.slug} value={c.slug || c.id}>{c.name}</option>
           ))}
         </select>
         <div className="flex items-center gap-2">
-          <input type="number" name="priceMin" placeholder={t('products.priceMin')} defaultValue={priceMin} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
-          <input type="number" name="priceMax" placeholder={t('products.priceMax')} defaultValue={priceMax} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
+          <input type="number" name="minPrice" placeholder={t('products.priceMin')} defaultValue={priceMin} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
+          <input type="number" name="maxPrice" placeholder={t('products.priceMax')} defaultValue={priceMax} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
         </div>
       </form>
       {items.length === 0 && (
