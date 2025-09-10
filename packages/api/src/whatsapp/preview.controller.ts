@@ -19,7 +19,8 @@ export class WhatsappPreviewController {
     const text = (textBody ?? textQ ?? '').toString();
     const rawLang = (typeof dto === 'object' ? dto?.lang : undefined) ?? langQ;
     const lang: Lang = rawLang === 'ar' ? 'ar' : 'en';
-    const messages = await this.intents.handleText(text, lang);
+    const from = (typeof dto === 'object' ? dto?.from : undefined) || undefined;
+    const messages = await this.intents.handleText(text, lang, from);
     return { ok: true, messages };
   }
 }

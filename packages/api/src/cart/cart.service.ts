@@ -11,12 +11,12 @@ export class CartService {
     return process.env.DEFAULT_CURRENCY || 'USD';
   }
 
-  private async ensurePreviewContext() {
-    // For initial scaffolding and preview/testing without WA context
-    const waPhone = 'preview';
+  private async ensureContext(waPhone?: string) {
+    // Bind cart to real WA sender when provided; fallback to preview when absent
+    const phone = waPhone || 'preview';
     let customer = await this.prisma.customer.findUnique({ where: { waPhone } });
     if (!customer) {
-      customer = await this.prisma.customer.create({ data: { waPhone, waName: 'Preview' } });
+      customer = await this.prisma.customer.create({ data: { waPhone: phone, waName: waPhone ? undefined : 'Preview' } });
     }
     let convo = await this.prisma.conversation.findUnique({ where: { customerId: customer.id } });
     if (!convo) {
@@ -25,8 +25,8 @@ export class CartService {
     return { customer, conversation: convo };
   }
 
-  async createOrGetCart() {
-    const { customer, conversation } = await this.ensurePreviewContext();
+  async createOrGetCart(waPhone?: string) {
+    const { customer, conversation } = await this.ensureContext(waPhone);
     let cart = await this.prisma.cart.findFirst({
       where: { customerId: customer.id, status: 'active' },
       include: { items: true },
@@ -44,13 +44,13 @@ export class CartService {
     return cart;
   }
 
-  async getCart() {
-    const { customer } = await this.ensurePreviewContext();
+  async getCart(waPhone?: string) {
+    const { customer } = await this.ensureContext(waPhone);
     const cart = await this.prisma.cart.findFirst({
       where: { customerId: customer.id, status: 'active' },
       include: { items: true },
     });
-    if (!cart) return await this.createOrGetCart();
+    if (!cart) return await this.createOrGetCart(waPhone);
     return cart;
   }
 
@@ -72,8 +72,8 @@ export class CartService {
     return product;
   }
 
-  async addItem(dto: { productId?: string; sku?: string; qty: number }, idempotencyKey?: string) {
-    const cart = await this.createOrGetCart();
+  async addItem(dto: { productId?: string; sku?: string; qty: number }, idempotencyKey?: string, waPhone?: string) {
+    const cart = await this.createOrGetCart(waPhone);
 
     // Check idempotency cache
     if (idempotencyKey && this.cache.isEnabled()) {
@@ -177,12 +177,42 @@ export class CartService {
     });
   }
 
-  async estimateShipping() {
-    const cart = await this.getCart();
+  async estimateShipping(waPhone?: string) {
+    const cart = await this.getCart(waPhone);
     const subtotal = cart.subtotalMinor || 0;
     // Simple stub: free shipping over 100 (in major units)
     const freeThreshold = 100 * 100;
     const shippingMinor = subtotal >= freeThreshold ? 0 : 20 * 100;
     return { currency: cart.currency || this.defaultCurrency(), shippingMinor, freeThresholdMinor: freeThreshold };
+  }
+
+  async updateItemQtyBySku(waPhone: string | undefined, sku: string, qty: number) {
+    const cart = await this.createOrGetCart(waPhone);
+    await this.prisma.$transaction(async (tx) => {
+      const item = await tx.cartItem.findFirst({ where: { cartId: cart.id, sku } });
+      if (!item) throw new NotFoundException('item not found');
+      if (qty <= 0) {
+        await tx.cartItem.delete({ where: { id: item.id } });
+      } else {
+        await tx.cartItem.update({ where: { id: item.id }, data: { qty, lineTotalMinor: qty * item.priceSnapshotMinor } });
+      }
+      const items = await tx.cartItem.findMany({ where: { cartId: cart.id } });
+      const totals = this.computeTotals(items);
+      await tx.cart.update({
+        where: { id: cart.id },
+        data: {
+          subtotalMinor: totals.subtotal,
+          taxMinor: totals.tax,
+          shippingMinor: totals.shipping,
+          totalMinor: totals.total,
+          version: { increment: 1 } as unknown as number | Prisma.IntFieldUpdateOperationsInput,
+        },
+      });
+    });
+    return this.getCart(waPhone);
+  }
+
+  async removeItemBySku(waPhone: string | undefined, sku: string) {
+    return this.updateItemQtyBySku(waPhone, sku, 0);
   }
 }

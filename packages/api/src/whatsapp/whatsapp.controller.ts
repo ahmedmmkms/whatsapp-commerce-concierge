@@ -75,7 +75,7 @@ export class WhatsappController {
         if (process.env.WHATSAPP_SEND_ENABLED === '1' && msg.text) {
           try {
             const lang = 'en';
-            const out = await this.intents.handleText(msg.text, lang as any);
+            const out = await this.intents.handleText(msg.text, lang as any, msg.from);
             await this.sender.sendBatch(msg.from, out as any);
           } catch (e) {
             // eslint-disable-next-line no-console

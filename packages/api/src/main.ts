@@ -55,7 +55,7 @@ async function bootstrap() {
 }
 
 // Only auto-bootstrap when running as a standalone process
-if (process.env.VERCEL !== '1') {
+if (process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'test') {
   // Avoid auto-start inside Vercel serverless function
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   bootstrap();

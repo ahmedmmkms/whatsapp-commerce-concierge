@@ -170,4 +170,5 @@ model CartItem {
 
   @@unique([cartId, productId])
   @@index([cartId])
+  @@index([cartId, sku])
 }

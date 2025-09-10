@@ -8,7 +8,7 @@ export type Lang = 'en' | 'ar';
 export class IntentService {
   constructor(private readonly catalog: CatalogService, private readonly cart: CartService) {}
 
-  async handleText(text: string, lang: Lang = 'en') {
+  async handleText(text: string, lang: Lang = 'en', waPhone?: string) {
     const t = (text || '').trim();
     if (!t) return [this.msg(lang, 'empty')];
 
@@ -27,7 +27,7 @@ export class IntentService {
       const found = await this.catalog.listProducts({ q: addSku, page: 1, pageSize: 1 });
       const p = found.items[0];
       if (!p) return [this.msg(lang, 'notFound')];
-      await this.cart.addItem({ sku: p.sku || undefined, productId: p.id, qty: 1 });
+      await this.cart.addItem({ sku: p.sku || undefined, productId: p.id, qty: 1 }, undefined, waPhone);
       const price = (p.price / 100).toFixed(2) + ' ' + (p.currency || 'USD');
       const replies = [
         { title: this.tr(lang, 'cart'), payload: 'cart' },
@@ -38,11 +38,29 @@ export class IntentService {
 
     // Cart view
     if (this.isCart(t, lang)) {
-      const c = await this.cart.getCart();
+      const c = await this.cart.getCart(waPhone);
       if (!c.items?.length) return [{ type: 'text', text: this.tr(lang, 'cartEmpty') }];
       const lines = c.items.map((it: any) => `• ${it.nameSnapshot} x${it.qty} — ${(it.lineTotalMinor / 100).toFixed(2)} ${c.currency}`);
       const replies = [{ title: this.tr(lang, 'browse'), payload: 'browse' }];
       return [{ type: 'text', text: this.tr(lang, 'cartHeader') }, { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
+    }
+
+    // Cart qty update
+    const qtyCmd = this.parseQtySku(text, lang);
+    if (qtyCmd) {
+      await this.cart.updateItemQtyBySku(waPhone, qtyCmd.sku, qtyCmd.qty);
+      const c = await this.cart.getCart(waPhone);
+      const lines = c.items.map((it: any) => `• ${it.nameSnapshot} x${it.qty} — ${(it.lineTotalMinor / 100).toFixed(2)} ${c.currency}`);
+      return [{ type: 'text', text: this.tr(lang, 'cartHeader') }, { type: 'text', text: lines.join('\n') }];
+    }
+
+    // Cart remove by sku
+    const remSku = this.parseRemoveSku(text, lang);
+    if (remSku) {
+      await this.cart.removeItemBySku(waPhone, remSku);
+      const c = await this.cart.getCart(waPhone);
+      const lines = c.items.map((it: any) => `• ${it.nameSnapshot} x${it.qty} — ${(it.lineTotalMinor / 100).toFixed(2)} ${c.currency}`);
+      return [{ type: 'text', text: this.tr(lang, 'cartHeader') }, { type: 'text', text: lines.join('\n') }];
     }
 
     // Product details by sku
@@ -122,6 +140,17 @@ export class IntentService {
     const m = t.match(/^add\s+(\S+)/i) || (lang === 'ar' ? t.match(/^(���)\s+(\S+)/) : null);
     return m ? (m[1] || m[2]) : '';
   }
+  private parseQtySku(t: string, lang: Lang): { sku: string; qty: number } | null {
+    const m = t.match(/^qty\s+(\S+)\s+(\d+)/i);
+    if (!m) return null;
+    const sku = m[1];
+    const qty = Math.max(0, parseInt(m[2], 10));
+    return { sku, qty };
+  }
+  private parseRemoveSku(t: string, lang: Lang) {
+    const m = t.match(/^remove\s+(\S+)/i);
+    return m ? (m[1] || m[2]) : '';
+  }
   private parseDetailsSku(t: string, lang: Lang) {
     const m = t.match(/^(details|detail)\s+(\S+)/i) || (lang === 'ar' ? t.match(/^(�埭��)\s+(\S+)/) : null);
     return m ? m[2] : '';
@@ -173,4 +202,3 @@ export class IntentService {
     return (lang === 'ar' ? ar : en)[key];
   }
 }
-
