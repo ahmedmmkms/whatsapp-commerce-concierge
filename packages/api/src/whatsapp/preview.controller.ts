@@ -1,4 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Query, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { IntentService, type Lang } from './intent.service.js';
 
 class PreviewDto {
@@ -13,9 +14,12 @@ export class WhatsappPreviewController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async preview(@Body() dto: PreviewDto) {
-    const lang: Lang = dto.lang === 'ar' ? 'ar' : 'en';
-    const messages = await this.intents.handleText(dto.text || '', lang);
+  async preview(@Body() dto: any, @Query('text') textQ?: string, @Query('lang') langQ?: string, @Req() req?: Request) {
+    const textBody = typeof dto === 'string' ? dto : dto?.text;
+    const text = (textBody ?? textQ ?? '').toString();
+    const rawLang = (typeof dto === 'object' ? dto?.lang : undefined) ?? langQ;
+    const lang: Lang = rawLang === 'ar' ? 'ar' : 'en';
+    const messages = await this.intents.handleText(text, lang);
     return { ok: true, messages };
   }
 }
