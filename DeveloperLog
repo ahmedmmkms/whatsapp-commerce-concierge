@@ -356,3 +356,17 @@ Backlog (Post-MVP)
 - Observability/Perf: kept Redis cache for idempotency; added index; P95 target < 200ms for cart ops (validated spot checks).
 - Docs: docs/sprint-3-features.md updated with WA command examples, API examples, perf notes.
 - Tag/Release: prepare tag 'sprint-3-finished' with title 'Sprint 3 finished' after merging to main.
+
+== 0038: Plan Update — Web Frontend as Sprint 4 ==
+- Decision: Insert a dedicated Web Frontend MVP sprint as Sprint 4 to deliver a polished, lightweight website (home, categories, list/detail, i18n/RTL, WhatsApp handoff). Shift prior sprints accordingly.
+- Changes:
+  - New: Sprint 4 (Weeks 7–8) Web Frontend MVP.
+  - Previous Sprint 4 (Checkout) → Sprint 5 (Weeks 9–10).
+  - Previous Sprint 5 (Orders/Returns/CMS/Support page) → Sprint 6 (Weeks 11–12).
+  - Previous Sprint 6 (Hardening/UAT/Pilot) → Sprint 7 (Weeks 13–14).
+- Docs:
+  - Added docs/sprint-plan-mvp-rev1.md reflecting revised schedule.
+  - Added docs/backlog-rev1.md with shifted issue buckets including the new web sprint.
+- Next Steps:
+  - Bootstrap GitHub milestones/issues from docs/backlog-rev1.md (or adapt existing script to read it).
+  - Align Vercel Web env (`NEXT_PUBLIC_API_URL`), styling assets, and WhatsApp deeplink phone number.
