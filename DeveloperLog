@@ -112,7 +112,7 @@ Log Purpose: Running timeline and decisions for smooth handover.
 - NFRs: PDPL consent, PCI-aware (via gateway), 99.9% SLA, P95 API < 300ms.
 - Risks: WA onboarding delays ? sandbox first; Payments risk ? start COD + one provider; Infra quotas on free tiers.
 
-Sprint 1 (Weeks 1–2): WA Webhook, Core Dialog, Foundations
+Sprint 1 (Weeks 1ï¿½2): WA Webhook, Core Dialog, Foundations
 Goals
 - Stabilize WhatsApp webhook verify/ingest; lay base conversation loop.
 - Stand up DB (Neon) + Redis (Upstash) + BullMQ wiring; choose ORM and migrations.
@@ -128,7 +128,7 @@ QA/Perf
 Risks/Mitigations
 - WA sandbox only ? simulate inbound events via fixtures; decouple from Meta uptime.
 
-Sprint 2 (Weeks 3–4): Catalog Sync + Browse
+Sprint 2 (Weeks 3ï¿½4): Catalog Sync + Browse
 Goals
 - Implement catalog ingestion and search; enable conversational browse in WA.
 Deliverables
@@ -142,7 +142,7 @@ QA/Perf
 Risks/Mitigations
 - Catalog source instability ? file-based seed fallback and nightly sync.
 
-Sprint 3 (Weeks 5–6): Conversational Cart
+Sprint 3 (Weeks 5ï¿½6): Conversational Cart
 Goals
 - Add cart creation/persistence and line-item ops via chat.
 Deliverables
@@ -156,7 +156,7 @@ QA/Perf
 Risks/Mitigations
 - Session confusion across devices ? bind cart to WA sender ID + TTL.
 
-Sprint 4 (Weeks 7–8): Checkout (COD + Stripe)
+Sprint 4 (Weeks 7ï¿½8): Checkout (COD + Stripe)
 Goals
 - Implement checkout with COD baseline and Stripe card in test.
 Deliverables
@@ -170,7 +170,7 @@ QA/Perf
 Risks/Mitigations
 - Payment failures ? optimistic order reserve + state machine retries.
 
-Sprint 5 (Weeks 9–10): Orders, Tracking, Returns, Basic CMS
+Sprint 5 (Weeks 9ï¿½10): Orders, Tracking, Returns, Basic CMS
 Goals
 - Expose order status, returns ticketing, and operator content controls.
 Deliverables
@@ -184,7 +184,7 @@ QA/Perf
 Risks/Mitigations
 - Abuse on returns ? simple rules (time window, item condition prompts).
 
-Sprint 6 (Weeks 11–12): Hardening, UAT, Pilot Go-Live
+Sprint 6 (Weeks 11ï¿½12): Hardening, UAT, Pilot Go-Live
 Goals
 - Close NFRs, observability, and readiness; execute UAT and pilot.
 Deliverables
@@ -312,7 +312,7 @@ Backlog (Post-MVP)
 - Added postinstall script in packages/api to run prisma generate during Vercel install to fix '@prisma/client did not initialize yet' runtime error.
 - Ensure Vercel API project uses pnpm and installs deps (postinstall runs).
 
-== 0035: Sprint 1 — Completed ==
+== 0035: Sprint 1 ï¿½ Completed ==
 - Status: All Sprint 1 smoke tests PASS on Vercel API (production-first); CURL CORS check confirmed.
 - WhatsApp Webhook: GET verify echoes challenge; POST ingest validates X-Hub-Signature-256 (optional via WHATSAPP_APP_SECRET), returns 200 ack, parses messages, logs count, and (best-effort) persists Customer/Conversation.
 - Data & Migrations: Prisma schema (Customer, Conversation unique per customer, Consent); initial migration checked in; CI workflow deploys schema to Neon; Prisma client generation on CI and Vercel (postinstall + build).
@@ -323,3 +323,15 @@ Backlog (Post-MVP)
 - Serverless/Infra: Vercel catch-all function for Nest; vercel.json stable builder; pnpm workspace; CI (build/test) + db-deploy on main/tags.
 - Tooling/Scripts: scripts/test-whatsapp-webhook.ps1 (signed POST tester); scripts/sprint1-smoke.ps1 (E2E smoke for health/CORS/verify/webhook/consents/queue).
 - Notes: Background job worker & full event enqueue scheduled for Sprint 2; Catalog/browse flow starts next sprint.
+
+== 0017: Sprint 2 Completed (Catalog + Browse) ==
+- Data models: added Category, Product, ProductMedia, and CatalogSyncLog (migrations included).
+- APIs delivered: GET /products, GET /products/:id, GET /categories, GET /catalog/health, POST /catalog/sync.
+- Catalog sync: demo feed ingestion with idempotent upsert; nightly sync GitHub Action.
+- WhatsApp intents (preview): browse, show/more with quick replies; AR/EN templates; preview endpoint.
+- Web QA: /products and /products/[id] pages; RTL toggle in layout.
+- Caching: Redis-backed query caching with fail-safe (CACHE_DISABLED supported); health exposes cache metrics.
+- Metrics: catalog timings (last/avg) surfaced in /catalog/health.
+- Tests: Sprint 2 smoke + feature scripts; acceptance runner (unit + E2E) added.
+- Ops: Vercel DI fix (export CatalogService); reduced Redis noise; /whatsapp/preview robust to body/query.
+- Tag/Release: to be created as 'sprint-2-finished' with title 'Sprint 2 fininshed'.
