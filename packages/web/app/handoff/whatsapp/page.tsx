@@ -1,6 +1,7 @@
 "use client"
 import { useEffect } from 'react'
 import { useI18n } from '../../../components/i18n/provider'
+import { track } from '../../../components/analytics'
 
 function buildMessage(params: URLSearchParams) {
   const name = params.get('name') || ''
@@ -26,6 +27,7 @@ export default function WhatsAppHandoff() {
     const params = new URLSearchParams(window.location.search)
     const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER
     const msg = buildMessage(params)
+    track('handoff_opened', { hasNumber: !!waNumber, productId: params.get('productId') || undefined })
     if (waNumber) {
       const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`
       window.location.replace(url)
@@ -35,11 +37,11 @@ export default function WhatsAppHandoff() {
   const hasNumber = !!process.env.NEXT_PUBLIC_WA_NUMBER
   return (
     <div>
-      <h1 className="prose-title mb-2">WhatsApp Handoff</h1>
+      <h1 className="prose-title mb-2">{t('handoff.title')}</h1>
       {!hasNumber ? (
-        <p className="prose-subtle">Set NEXT_PUBLIC_WA_NUMBER to enable deeplinks.</p>
+        <p className="prose-subtle">{t('handoff.missing')}</p>
       ) : (
-        <p className="prose-subtle">{t('cta.chatToOrder')}…</p>
+        <p className="prose-subtle">{t('handoff.redirecting')}</p>
       )}
     </div>
   )

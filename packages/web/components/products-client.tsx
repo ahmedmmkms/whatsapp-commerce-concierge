@@ -6,6 +6,7 @@ import { Card, CardBody, CardTitle, CardSubtitle } from './ui/card'
 import { Price } from './price'
 import { IconSearch } from './icons'
 import { useI18n } from './i18n/provider'
+import { useTrackOnMount } from './analytics'
 
 type Props = {
   items: any[]
@@ -18,6 +19,7 @@ type Props = {
 
 export default function ProductsClient({ items, categories, q, category, priceMin, priceMax }: Props) {
   const { t } = useI18n()
+  useTrackOnMount('view_list', { q, category, count: items.length })
   return (
     <div>
       <h1 className="prose-title mb-4">{t('products.title')}</h1>
@@ -29,6 +31,7 @@ export default function ProductsClient({ items, categories, q, category, priceMi
               name="q"
               placeholder={t('products.search')}
               defaultValue={q}
+              aria-label={t('products.search')}
               className="w-full h-9 rounded-md border border-border bg-background pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
@@ -37,6 +40,7 @@ export default function ProductsClient({ items, categories, q, category, priceMi
         <select
           name="category"
           defaultValue={category}
+          aria-label={t('products.category')}
           className="h-9 rounded-md border border-border bg-background px-3 text-sm"
         >
           <option value="">{t('products.all')}</option>
@@ -45,8 +49,8 @@ export default function ProductsClient({ items, categories, q, category, priceMi
           ))}
         </select>
         <div className="flex items-center gap-2">
-          <input type="number" name="minPrice" placeholder={t('products.priceMin')} defaultValue={priceMin} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
-          <input type="number" name="maxPrice" placeholder={t('products.priceMax')} defaultValue={priceMax} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
+          <input type="number" name="minPrice" placeholder={t('products.priceMin')} defaultValue={priceMin} aria-label={t('products.priceMin')} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
+          <input type="number" name="maxPrice" placeholder={t('products.priceMax')} defaultValue={priceMax} aria-label={t('products.priceMax')} className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm" />
         </div>
       </form>
       {items.length === 0 && (

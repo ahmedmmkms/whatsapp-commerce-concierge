@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { ChatToOrderButton } from '../../../components/chat-to-order-button'
 import { BackToProductsButton } from '../../../components/back-to-products-button'
+import ProductViewTracker from './tracker'
+import { NotFoundText } from '../../../components/not-found-text'
 
 async function getApiBase() {
   if (process.env.NEXT_PUBLIC_API_URL) return '/api'
@@ -23,11 +25,12 @@ export default async function ProductDetail({ params }: { params: { id: string }
   const data = await getProduct(params.id)
   const p = data.product
   if (!p) {
-    return <div><p className="prose-subtle">Not found</p></div>
+    return <div><NotFoundText /></div>
   }
   const img = p.media?.[0]?.url
   return (
     <div>
+      <ProductViewTracker id={p.id} name={p.name} priceMinor={p.price} currency={p.currency} />
       <h1 className="prose-title mb-2">{p.name}</h1>
       {img && (
         <div className="mb-3 overflow-hidden rounded-lg border border-border max-w-xl">
