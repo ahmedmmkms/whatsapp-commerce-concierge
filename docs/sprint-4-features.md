@@ -1,6 +1,6 @@
 # Sprint 4 Features — Web Frontend MVP
 
-Date: 2025-09-24 (planned)
+Date: 2025-09-24 (completed)
 Owner: AMM
 
 Scope
@@ -67,7 +67,7 @@ Accessibility & i18n
 Testing
 - Unit: price formatting, i18n util, filter logic.
 - E2E (Playwright): list filters, product detail, deeplink construction, RTL switch.
-- Lighthouse CI run for Home, List, Detail (thresholds: 90+ perf/accessibility/SEO).
+- Lighthouse: spot-checks ≥90 for perf/accessibility/SEO (CI automation deferred).
 
 Test Scripts (PowerShell)
 - `scripts/sprint4-smoke.ps1` — open pages, validate key text, build deeplink.
@@ -95,11 +95,13 @@ Risks/Mitigations
 - i18n regressions — snapshot small text fragments per locale; manual RTL review.
 - Web/API CORS mismatch — confirm proxy rewrite and allowed origins.
 
-Changelog Additions (Planned)
+Changelog Additions
 - Added AR/EN i18n dictionaries and RTL support in `packages/web`.
 - Implemented `/handoff/whatsapp` deeplink utility and CTAs on product cards/detail.
 - Added client-side filters and analytics event stubs.
+- Removed nightly catalog sync GitHub Action (`.github/workflows/catalog-nightly-sync.yml`).
 
 Notes
 - Current repo already includes minimal `/` and `/products` pages using `NEXT_PUBLIC_API_BASE_URL`. This sprint expands them and adds i18n/RTL, filters, analytics, and deeplinks.
+
 

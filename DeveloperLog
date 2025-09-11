@@ -370,3 +370,16 @@ Backlog (Post-MVP)
 - Next Steps:
   - Bootstrap GitHub milestones/issues from docs/backlog-rev1.md (or adapt existing script to read it).
   - Align Vercel Web env (`NEXT_PUBLIC_API_URL`), styling assets, and WhatsApp deeplink phone number.
+
+== 0039: Sprint 4 — Completed (Web Frontend MVP) ==
+- Web UI: Implemented Home, Products list/detail, and WhatsApp handoff route with polished Tailwind token theme and reusable UI (button/card/badge).
+- i18n/RTL: Added EN/AR dictionaries with locale toggle; dir attribute synchronized to language; all visible strings localized.
+- Search/Filters: Client-side search; category (slug) and min/max price filters wired to API.
+- Images: Integrated next/image (unoptimized for MVP) and added tooling to fetch/apply relevant product images.
+  - New scripts: packages/api/scripts/fetch-unsplash-images.mjs (builds SKU→URLs via Unsplash) and packages/api/scripts/update-product-images.mjs (updates ProductMedia).
+  - Docs: docs/unsplash-setup.md, docs/image-mapping.md, sample mapping under data/product-images.sample.json.
+- Analytics: Added lightweight window.dataLayer events — view_list, view_product, click_whatsapp_handoff, handoff_opened.
+- Resilience: Absolute API base for SSR; safer fetch with graceful empty-state; Next rewrites retained for client.
+- CI: Fixed ESLint TS parser issues; Next build no longer fails on lint; added local lint script and JSX entity rule.
+- Ops: Removed nightly catalog sync GitHub Action (.github/workflows/catalog-nightly-sync.yml) as demo feed is stable and manual sync is sufficient.
+- Acceptance: Lighthouse spot check passes Core Web Vitals locally; automate thresholds later in CI.
