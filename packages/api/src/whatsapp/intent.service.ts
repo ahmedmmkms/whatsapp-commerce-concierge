@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CatalogService } from '../catalog/catalog.service.js';
 import { CartService } from '../cart/cart.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { ReturnsService } from '../returns/returns.service.js';
+import { TemplateService } from '../cms/template.service.js';
 
 export type Lang = 'en' | 'ar';
 
 @Injectable()
 export class IntentService {
-  constructor(private readonly catalog: CatalogService, private readonly cart: CartService) {}
+  constructor(
+    private readonly catalog: CatalogService,
+    private readonly cart: CartService,
+    private readonly prisma: PrismaService,
+    private readonly returns: ReturnsService,
+    private readonly templates: TemplateService,
+  ) {}
 
   async handleText(text: string, lang: Lang = 'en', waPhone?: string) {
     const t = (text || '').trim();
@@ -19,6 +28,46 @@ export class IntentService {
       const lines = top.map((c: any) => `• ${c.name}`);
       const replies = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
       return [this.msg(lang, 'browseHeader'), { type: 'text', text: lines.join('\n') }, { type: 'quick_replies', replies }];
+    }
+
+    // Status intent: "status <orderId>"
+    const statusId = this.parseStatus(t, lang);
+    if (statusId) {
+      const order = await this.prisma.order.findUnique({ where: { id: statusId } });
+      if (!order) return [this.msg(lang, 'notFound')];
+      const tpl = await this.templates.get('order_status', lang);
+      const body = tpl?.body
+        ? this.templates.interpolate(tpl.body, {
+            orderId: order.id,
+            status: order.status,
+            total: (order.totalMinor / 100).toFixed(2),
+            currency: order.currency,
+          })
+        : `Order ${order.id} is ${order.status}. Total: ${(order.totalMinor / 100).toFixed(2)} ${order.currency}`;
+      return [{ type: 'text', text: body }];
+    }
+
+    // Return intent: "return <orderId>"
+    const returnId = this.parseReturn(t, lang);
+    if (returnId) {
+      const res = await this.returns.create(returnId, 'wa_intent');
+      if (!res.ok) {
+        return [{ type: 'text', text: `Return not created (${res.error})` }];
+      }
+      const tpl = await this.templates.get('start_return', lang);
+      const body = tpl?.body ? this.templates.interpolate(tpl.body, { orderId: returnId, rma: res.rmaCode }) : `Started return for ${returnId}. RMA: ${res.rmaCode}`;
+      const tpl2 = await this.templates.get('rma_instructions', lang);
+      const body2 = tpl2?.body ? this.templates.interpolate(tpl2.body, { rma: res.rmaCode, days: process.env.RETURNS_ELIGIBLE_DAYS || '30' }) : '';
+      const msgs: any[] = [{ type: 'text', text: body }];
+      if (body2) msgs.push({ type: 'text', text: body2 });
+      return msgs;
+    }
+
+    // Human handoff intent
+    if (this.isAgent(t, lang)) {
+      const tpl = await this.templates.get('human_handoff', lang);
+      const body = tpl?.body || (lang === 'ar' ? 'حسنًا، سنوصلك بممثل خدمة العملاء.' : 'Okay, connecting you to a human agent.');
+      return [{ type: 'text', text: body }];
     }
 
     // Cart add by sku
@@ -128,6 +177,18 @@ export class IntentService {
     const repliesNF = top.map((c: any) => ({ title: c.name, payload: `show ${c.slug}` }));
     repliesNF.unshift({ title: this.tr(lang, 'browse'), payload: 'browse' });
     return [this.msg(lang, 'help'), { type: 'quick_replies', replies: repliesNF }];
+  }
+
+  private parseStatus(t: string, lang: Lang) {
+    const m = t.match(/^status\s+(\S+)/i) || (lang === 'ar' ? t.match(/^\s*حالة\s+(\S+)/) : null);
+    return m ? m[1] : '';
+  }
+  private parseReturn(t: string, lang: Lang) {
+    const m = t.match(/^return\s+(\S+)/i) || (lang === 'ar' ? t.match(/^\s*إرجاع\s+(\S+)/) : null);
+    return m ? m[1] : '';
+  }
+  private isAgent(t: string, lang: Lang) {
+    return /\b(agent|human)\b/i.test(t) || (lang === 'ar' && /عميل|بشري|وكيل/.test(t));
   }
 
   private isBrowse(t: string, lang: Lang) {

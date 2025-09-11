@@ -58,7 +58,7 @@
   - Seed AR/EN templates: order_status, start_return, rma_instructions, human_handoff.
   - Resolve templates in WA flows with variable interpolation + locale fallback.
 - [Sprint 6] Support web page (order lookup)
-  - Next.js route `/support/order-lookup` (phone + orderId); calls Orders API; RTL + AR copy.
+  - Next.js route `/support/order-lookup` (phone + orderId); calls Orders API.
   - Anti-enumeration: simple throttling/captcha; handle API errors gracefully.
 - [Sprint 6] Tests/Docs/Obs (lightweight)
   - Update OpenAPI for new endpoints; add acceptance scripts under `scripts/`.
@@ -72,6 +72,12 @@
   - Circuit breakers, retries/backoff, DLQs, backups.
 - [Sprint 7] Compliance + UAT + pilot
   - PDPL workflows, privacy notices, UAT checklist pass.
+
+## Sprint 8
+- [Sprint 8] UI Polish (Support + WA templates)
+  - Support page UX polish: RTL labels, Arabic copy, accessibility pass.
+  - Visual tweaks and readability for template-driven messages (AR/EN).
+  - Minor styling consistency across web pages (buttons, spacing, states).
 
 ---
 ## Bootstrap to GitHub

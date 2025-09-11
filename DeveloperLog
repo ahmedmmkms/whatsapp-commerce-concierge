@@ -256,6 +256,15 @@ Backlog (Post-MVP)
   - scripts/sprint6/test-orders-lookup.ps1, test-returns-create.ps1, test-cms-templates.ps1
 - Note: scripts are endpoint-aware and degrade gracefully if not yet implemented (404 tolerated with info logs).
 
+== 0026: WA Intents wired to CMS Templates ==
+- Added TemplateService for fetching/interpolating templates with locale fallback (AR/EN).
+- Wired WhatsApp intents in IntentService:
+  - status <orderId> -> replies with 'order_status' template using order data.
+  - return <orderId> -> creates return via ReturnsService and replies with 'start_return' + 'rma_instructions'.
+  - agent/human keyword -> replies with 'human_handoff' template.
+- Updated WhatsappModule to import Prisma, Returns, and CMS modules.
+- Note: requires deploy to Vercel API and templates seeded to see in /whatsapp/preview.
+
 
 
 == 0025: Neon Detailed Guide ==
