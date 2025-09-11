@@ -49,16 +49,28 @@ export class CatalogService {
     if (cached) return cached;
 
     const t0 = Date.now();
-    const [total, items] = await this.prisma.$transaction([
-      this.prisma.product.count({ where }),
-      this.prisma.product.findMany({
-        where,
-        orderBy,
-        skip,
-        take: pageSize,
-        include: { media: { orderBy: { sortOrder: 'asc' }, take: 1 }, category: true },
-      }),
-    ]);
+    let total = 0;
+    let items: any[] = [];
+    try {
+      const tx = await this.prisma.$transaction([
+        this.prisma.product.count({ where }),
+        this.prisma.product.findMany({
+          where,
+          orderBy,
+          skip,
+          take: pageSize,
+          include: { media: { orderBy: { sortOrder: 'asc' }, take: 1 }, category: true },
+        }),
+      ]);
+      total = tx[0] as number;
+      items = tx[1] as any[];
+    } catch (err) {
+      // Degrade gracefully to avoid 500s in read paths; log minimal info to console in serverless
+      // eslint-disable-next-line no-console
+      console.warn('[catalog] listProducts failed; returning empty list', (err as Error)?.message || err);
+      total = 0;
+      items = [];
+    }
     const dt = Date.now() - t0;
     this.timings.productsLastMs = dt;
     this.timings.samples += 1;
