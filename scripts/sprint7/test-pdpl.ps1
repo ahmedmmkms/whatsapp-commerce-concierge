@@ -51,6 +51,13 @@ try {
     } else {
       Info "PDPL export failed $([int]$ex.StatusCode). Provide a valid AdminToken to test."
     }
+
+    # Attempt delete/redaction (non-fatal if fails)
+    $dreq = New-Object System.Net.Http.HttpRequestMessage 'Post', "$ApiBase/compliance/pdpl/delete"
+    $dreq.Headers.Add('x-admin-token', $AdminToken)
+    $dreq.Content = New-JsonContent ((@{ phone = $Phone } | ConvertTo-Json))
+    $dr = $client.SendAsync($dreq).GetAwaiter().GetResult()
+    if ($dr.IsSuccessStatusCode) { Ok "PDPL delete/redact accepted" } else { Info "PDPL delete responded $([int]$dr.StatusCode)" }
   } else {
     Info "AdminToken not provided; skipping export test."
   }
@@ -63,4 +70,3 @@ try {
 }
 
 if ($fail -gt 0) { Write-Host "PDPL tests FAILED with $fail error(s)." -ForegroundColor Red; exit 1 } else { Write-Host "PDPL tests PASSED." -ForegroundColor Green }
-

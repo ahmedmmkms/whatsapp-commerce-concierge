@@ -18,6 +18,8 @@ export type ProductQuery = {
 export class CatalogService {
   private timings = { productsLastMs: 0, categoriesLastMs: 0, productsAvgMs: 0, categoriesAvgMs: 0, samples: 0 };
   constructor(private readonly prisma: PrismaService, private readonly cache: CacheService) {}
+  private ttlProducts = Number(process.env.CACHE_TTL_PRODUCTS_SEC || 600);
+  private ttlCategories = Number(process.env.CACHE_TTL_CATEGORIES_SEC || 1800);
 
   async listProducts(params: ProductQuery) {
     const page = Math.max(1, params.page || 1);
@@ -77,7 +79,7 @@ export class CatalogService {
     this.timings.productsAvgMs = Math.round(((this.timings.productsAvgMs * (this.timings.samples - 1)) + dt) / this.timings.samples);
 
     const result = { total, page, pageSize, items };
-    await this.cache.set(cacheKey, result, 600);
+    await this.cache.set(cacheKey, result, this.ttlProducts);
     return result;
   }
 
@@ -101,7 +103,7 @@ export class CatalogService {
     this.timings.categoriesLastMs = dt;
     this.timings.samples += 1;
     this.timings.categoriesAvgMs = Math.round(((this.timings.categoriesAvgMs * (this.timings.samples - 1)) + dt) / this.timings.samples);
-    await this.cache.set(cacheKey, r, 1800);
+    await this.cache.set(cacheKey, r, this.ttlCategories);
     return r;
   }
 

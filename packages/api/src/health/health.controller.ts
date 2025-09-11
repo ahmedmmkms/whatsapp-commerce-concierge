@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { MetricsService } from './metrics.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Controller()
@@ -30,5 +31,14 @@ export class DbHealthController {
     } catch (err: any) {
       return { ok: false, error: err?.message || String(err) };
     }
+  }
+}
+
+@Controller('/health')
+export class MetricsController {
+  constructor(private readonly metrics: MetricsService) {}
+  @Get('/metrics')
+  metricsJson() {
+    return this.metrics.snapshot();
   }
 }

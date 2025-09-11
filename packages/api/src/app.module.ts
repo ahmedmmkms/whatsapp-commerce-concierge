@@ -14,8 +14,9 @@ import { ReturnsModule } from './returns/returns.module.js';
 import { CmsModule } from './cms/cms.module.js';
 import { ComplianceModule } from './compliance/compliance.module.js';
 
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { LoggingInterceptor } from './common/logging.interceptor.js';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
   ],
 })
 export class AppModule {}

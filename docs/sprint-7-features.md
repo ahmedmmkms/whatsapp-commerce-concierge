@@ -22,12 +22,18 @@ Status: Planned
 - DB/Cache
   - Index review: orders by phone, returns by orderId; add migrations.
   - Redis policy: TTLs for catalog and idempotency; warm keys as needed.
+  - Env: `CACHE_TTL_PRODUCTS_SEC`, `CACHE_TTL_CATEGORIES_SEC` to tune cache durations.
 - Resilience
   - Timeouts, retries with exponential backoff on external I/O (Stripe, DB, Redis, webhooks).
   - Circuit breakers for Stripe and WhatsApp outbound; graceful fallbacks and operator visibility.
   - BullMQ DLQs and retry policies; alerts on DLQ size and recurring failures.
 - Backups/Restore
   - Neon logical backups; Upstash snapshots; drill with documented RPO/RTO.
+
+## Dashboards & Alerts
+- Metrics endpoint: `GET /health/metrics` exposes route counts and p95 approximation.
+- Queue DLQ: `GET /queue/dlq/stats`; admin actions `POST /queue/dlq/requeue`, `POST /queue/mirror-failed-to-dlq`.
+- Alert hooks (scriptable): add CI job to call metrics endpoints and fail on thresholds.
 
 ## Compliance (PDPL)
 - Export
@@ -61,6 +67,8 @@ Status: Planned
 - Scripts
   - `scripts/sprint7-smoke.ps1` runs health/perf sanity and optional compliance checks (non-fatal if unimplemented).
   - `scripts/sprint7-acceptance.ps1` aggregates smoke and targeted verifications.
+  - `scripts/sprint7/test-perf-thresholds.ps1` asserts basic P95 limits.
+  - Load: `scripts/load/k6-baseline.js` and `scripts/load/artillery-browse-checkout.yml` for realistic profiles.
 
 ## Rollout
 - Stage first; monitor dashboards and alerts; enable pilot via feature flags.

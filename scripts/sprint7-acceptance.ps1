@@ -31,4 +31,7 @@ $pdplParams = @{ ApiBase = $ApiBase }
 if ($adminToken) { $pdplParams.AdminToken = $adminToken }
 Run 'PDPL Status/Export' 'sprint7/test-pdpl.ps1' $pdplParams
 
+# Simple perf thresholds (sequential requests as a sanity check)
+Run 'Perf Thresholds' 'sprint7/test-perf-thresholds.ps1' @{ ApiBase = $ApiBase }
+
 Write-Host "All Sprint 7 acceptance tests PASSED" -ForegroundColor Green

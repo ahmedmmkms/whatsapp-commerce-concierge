@@ -18,6 +18,9 @@ model Customer {
   waPhone      String        @db.VarChar(32)
   // Optional display name from WA profile
   waName       String?       @db.VarChar(128)
+  // PDPL redaction flags
+  isRedacted   Boolean       @default(false)
+  redactedAt   DateTime?
 
   conversations Conversation[]
   consents      Consent[]
@@ -291,6 +294,7 @@ model Return {
   items      ReturnItem[]
 
   @@index([orderId, status])
+  @@index([orderId, createdAt])
 }
 
 model ReturnItem {
@@ -335,4 +339,18 @@ model Template {
   updatedBy  String?  @db.VarChar(64)
 
   @@unique([key, locale, channel])
+}
+
+// Sprint 7: Compliance audit
+model ComplianceAudit {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  action      String   @db.VarChar(32) // export|delete
+  subjectType String   @db.VarChar(32) // customer
+  subjectId   String   @db.VarChar(64)
+  requestedBy String?  @db.VarChar(64)
+  status      String   @db.VarChar(24) // accepted|processing|succeeded|failed
+  details     Json?
+
+  @@index([subjectType, subjectId, createdAt])
 }

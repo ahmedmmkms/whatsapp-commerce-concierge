@@ -40,7 +40,7 @@ export async function createApp() {
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  // LoggingInterceptor is registered via APP_INTERCEPTOR to enable DI (metrics)
   // OpenAPI
   const config = new DocumentBuilder()
     .setTitle('WhatsApp Commerce Concierge API')

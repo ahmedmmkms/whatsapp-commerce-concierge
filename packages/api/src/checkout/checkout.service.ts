@@ -7,11 +7,14 @@ import { CheckoutInitDto, PaymentMethod } from './dto/checkout-init.dto.js';
 @Injectable()
 export class CheckoutService {
   private stripe?: Stripe;
+  private stripeFailures = 0;
+  private stripeBreakerUntil = 0;
 
   constructor(private prisma: PrismaService, private carts: CartService) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (key) {
-      this.stripe = new Stripe(key);
+      const retries = Number(process.env.STRIPE_MAX_NETWORK_RETRIES || 2);
+      this.stripe = new Stripe(key, { maxNetworkRetries: retries } as any);
     }
   }
 
@@ -88,6 +91,13 @@ export class CheckoutService {
     if (!this.stripe) {
       throw new Error('Stripe not configured');
     }
+    // Simple circuit breaker for Stripe session create
+    const now = Date.now();
+    const threshold = Number(process.env.STRIPE_BREAKER_THRESHOLD || 5);
+    const cooldownMs = Number(process.env.STRIPE_BREAKER_COOLDOWN_MS || 30000);
+    if (this.stripeBreakerUntil > now) {
+      throw new Error('Payments temporarily unavailable (stripe circuit open)');
+    }
 
     // If an existing stripe session/intent exists, reuse URL when possible
     const payment = await this.prisma.payment.findFirst({ where: { orderId: order!.id, provider: 'stripe' } });
@@ -99,7 +109,7 @@ export class CheckoutService {
     const cancelUrl = process.env.CHECKOUT_CANCEL_URL || 'https://example.com/cancel?orderId={ORDER_ID}';
 
     const lineItems = await this.prisma.orderItem.findMany({ where: { orderId: order!.id } });
-    const session = await this.stripe.checkout.sessions.create(
+    const createSession = async () => this.stripe!.checkout.sessions.create(
       {
         mode: 'payment',
         success_url: successUrl.replace('{ORDER_ID}', order!.id),
@@ -116,6 +126,21 @@ export class CheckoutService {
       },
       idempotencyKey ? { idempotencyKey } : undefined,
     );
+    let session: Stripe.Checkout.Session | undefined;
+    try {
+      session = await createSession();
+      this.stripeFailures = 0;
+    } catch (err) {
+      this.stripeFailures += 1;
+      // eslint-disable-next-line no-console
+      console.warn('[stripe] session create failed', (err as any)?.message || err);
+      if (this.stripeFailures >= threshold) {
+        this.stripeBreakerUntil = Date.now() + cooldownMs;
+        // eslint-disable-next-line no-console
+        console.warn('[stripe] circuit opened for', cooldownMs, 'ms');
+      }
+      throw err;
+    }
 
     await this.prisma.payment.upsert({
       where: { intentId: session.id },

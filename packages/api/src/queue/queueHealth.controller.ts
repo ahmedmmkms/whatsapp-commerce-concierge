@@ -1,4 +1,5 @@
-import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, HttpException, HttpStatus, Query, UseGuards } from '@nestjs/common';
+import { AdminTokenGuard } from '../common/admin-token.guard.js';
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import type { Redis, RedisOptions } from 'ioredis';
@@ -79,6 +80,80 @@ export class QueueHealthController {
       throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: msg }, HttpStatus.SERVICE_UNAVAILABLE);
     } finally {
       try { if (q) await q.close(); } catch {}
+      try { await (redis as Redis).quit(); } catch {}
+    }
+  }
+
+  @Get('/dlq/stats')
+  async dlqStats() {
+    if (!process.env.REDIS_URL) {
+      throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: 'Redis not configured' }, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    const redis = getRedisConnection();
+    let q: Queue | undefined;
+    let dlq: Queue | undefined;
+    try {
+      q = getQueue('whatsapp', redis as Redis);
+      dlq = getQueue('whatsapp:dlq', redis as Redis);
+      const qCounts = await q.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
+      const dlqCounts = await dlq.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed');
+      return { ok: true, primary: qCounts, dlq: dlqCounts };
+    } finally {
+      try { if (q) await q.close(); } catch {}
+      try { if (dlq) await dlq.close(); } catch {}
+      try { await (redis as Redis).quit(); } catch {}
+    }
+  }
+
+  @Post('/dlq/requeue')
+  @UseGuards(AdminTokenGuard)
+  async requeueFromDlq(@Query('limit') limitStr?: string) {
+    if (!process.env.REDIS_URL) {
+      throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: 'Redis not configured' }, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    const limit = Math.max(1, Math.min(200, Number(limitStr) || 50));
+    const redis = getRedisConnection();
+    let q: Queue | undefined;
+    let dlq: Queue | undefined;
+    try {
+      q = getQueue('whatsapp', redis as Redis);
+      dlq = getQueue('whatsapp:dlq', redis as Redis);
+      const jobs = await dlq.getJobs(['wait', 'delayed'], 0, limit - 1);
+      if (!jobs.length) return { ok: true, moved: 0 };
+      const data = jobs.map((j) => ({ name: j.name || 'dlq', data: j.data, opts: j.opts }));
+      await q.addBulk(data);
+      for (const j of jobs) {
+        try { await j.remove(); } catch {}
+      }
+      return { ok: true, moved: jobs.length };
+    } finally {
+      try { if (q) await q.close(); } catch {}
+      try { if (dlq) await dlq.close(); } catch {}
+      try { await (redis as Redis).quit(); } catch {}
+    }
+  }
+
+  @Post('/mirror-failed-to-dlq')
+  @UseGuards(AdminTokenGuard)
+  async mirrorFailedToDlq(@Query('limit') limitStr?: string) {
+    if (!process.env.REDIS_URL) {
+      throw new HttpException({ statusCode: HttpStatus.SERVICE_UNAVAILABLE, message: 'Redis not configured' }, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    const limit = Math.max(1, Math.min(200, Number(limitStr) || 50));
+    const redis = getRedisConnection();
+    let q: Queue | undefined;
+    let dlq: Queue | undefined;
+    try {
+      q = getQueue('whatsapp', redis as Redis);
+      dlq = getQueue('whatsapp:dlq', redis as Redis);
+      const failed = await q.getJobs(['failed'], 0, limit - 1);
+      if (!failed.length) return { ok: true, mirrored: 0 };
+      const data = failed.map((j) => ({ name: j.name || 'failed', data: j.data, opts: j.opts }));
+      await dlq.addBulk(data);
+      return { ok: true, mirrored: failed.length };
+    } finally {
+      try { if (q) await q.close(); } catch {}
+      try { if (dlq) await dlq.close(); } catch {}
       try { await (redis as Redis).quit(); } catch {}
     }
   }

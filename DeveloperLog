@@ -420,3 +420,16 @@ t- Testing: Unit for CartService and utils; E2E for lifecycle/idempotency; concu
 - Docs: Updated `docs/sprint-5-features.md` (completed) and backlog (revised sprint order already in place).
 - Tag/Release: prepare tag 'sprint-5-finished' with title 'Sprint 5 finished'.
 - Next: Sprint 6 bootstrapping (Orders API expansion, Returns flow, Basic CMS, Support page).
+
+== 0041: Sprint 7 - Initial Hardening Work ==
+- Added Compliance (PDPL) module with endpoints:
+  - GET /compliance/pdpl/status (capabilities)
+  - POST /compliance/pdpl/export (admin-only, inline JSON MVP)
+  - POST /compliance/pdpl/delete (202 stub; redaction planned)
+- Reliability: WhatsApp sender now uses timeouts, retries with backoff, and a simple circuit breaker (envs: WA_SEND_TIMEOUT_MS, WA_SEND_MAX_RETRIES, WA_SEND_BREAKER_THRESHOLD, WA_SEND_BREAKER_COOLDOWN_MS).
+- Queue ops: Extended /queue endpoints with DLQ utilities:
+  - GET /queue/dlq/stats, POST /queue/dlq/requeue (admin), POST /queue/mirror-failed-to-dlq (admin).
+- Performance: Added Return(orderId, createdAt) composite index via migration 20250912_sprint7_indexes.
+- Caching: Catalog TTLs configurable via CACHE_TTL_PRODUCTS_SEC and CACHE_TTL_CATEGORIES_SEC.
+- Scripts: Added scripts/sprint7-acceptance.ps1 (runs smoke + PDPL + perf thresholds), scripts/sprint7-smoke.ps1, scripts/sprint7/test-pdpl.ps1, scripts/sprint7/test-perf-thresholds.ps1.
+- Docs: docs/sprint-7-features.md updated to reflect MVP PDPL and cache envs.

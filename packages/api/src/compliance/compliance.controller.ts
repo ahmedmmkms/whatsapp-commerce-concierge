@@ -32,8 +32,9 @@ export class ComplianceController {
   @HttpCode(202)
   @ApiBody({ type: PdplExportRequestDto })
   @ApiResponse({ status: 202, description: 'PDPL delete scheduled (stub)' })
-  async requestDelete(_body: PdplExportRequestDto) {
-    return this.svc.scheduleDelete();
+  async requestDelete(body: PdplExportRequestDto) {
+    const res = await this.svc.redactCustomerByIdOrPhone({ phone: body.phone, customerId: body.customerId });
+    if (!res.ok) return { ok: false, error: res.error };
+    return { ok: true, auditId: res.auditId };
   }
 }
-

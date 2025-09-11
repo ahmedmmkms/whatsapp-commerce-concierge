@@ -1,0 +1,19 @@
+config:
+  target: "${API_BASE:-http://localhost:3001}"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+scenarios:
+  - name: browse and checkout cod
+    flow:
+      - get:
+          url: "/products?page=1&pageSize=10"
+      - post:
+          url: "/cart"
+      - post:
+          url: "/checkout/init"
+          json:
+            method: "cod"
+          headers:
+            Idempotency-Key: "{{ $randomString() }}"
+
