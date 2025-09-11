@@ -383,3 +383,12 @@ t- Testing: Unit for CartService and utils; E2E for lifecycle/idempotency; concu
 - CI: Fixed ESLint TS parser issues; Next build no longer fails on lint; added local lint script and JSX entity rule.
 - Ops: Removed nightly catalog sync GitHub Action (.github/workflows/catalog-nightly-sync.yml) as demo feed is stable and manual sync is sufficient.
 - Acceptance: Lighthouse spot check passes Core Web Vitals locally; automate thresholds later in CI.
+
+== 0040: Sprint 5 ? Completed (Checkout + Payments) ==
+- Status: Sprint 5 acceptance tests PASS against https://whatsapp-commerce-concierge-api.vercel.app/.
+- Endpoints: Delivered `POST /checkout/init`, `POST /payments/stripe/webhook` (signature verified), `GET /orders/:id`.
+- Data: Added Prisma models Address, Order, OrderItem, Payment; applied migrations.
+- Scripts: Added Sprint 5 smoke and acceptance scripts under `scripts/`.
+- Docs: Updated `docs/sprint-5-features.md` (completed) and backlog (revised sprint order already in place).
+- Tag/Release: prepare tag 'sprint-5-finished' with title 'Sprint 5 finished'.
+- Next: Sprint 6 bootstrapping (Orders API expansion, Returns flow, Basic CMS, Support page).

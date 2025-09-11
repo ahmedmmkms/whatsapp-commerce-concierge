@@ -1,7 +1,7 @@
 # Sprint 5 Features – Checkout, Payments (COD + Stripe), Address
 
-Date: 2025-10-?? (planned)
-Owner: TBD
+Date: 2025-10-?? (completed)
+Owner: AMM
 
 ## Scope
 - Checkout MVP bridging WhatsApp and web: create idempotent orders from the cart, capture address, and complete payment via COD or Stripe (test mode).
@@ -76,3 +76,13 @@ Owner: TBD
 
 ## Rollout
 - Dev/staging first with Stripe test keys; enable COD behind a flag for early pilot; tag release `sprint-5-start` and `sprint-5-finished`.
+
+## Changelog Additions
+- Endpoints: `POST /checkout/init`, `POST /payments/stripe/webhook` (verified), `GET /orders/:id`.
+- Data model: `Address`, `Order`, `OrderItem`, `Payment` added to Prisma schema.
+- Env: added `CHECKOUT_SUCCESS_URL`, `CHECKOUT_CANCEL_URL` in `packages/api/.env.example`.
+- Scripts: Sprint 5 smoke, focused tests, and acceptance runner under `scripts/`.
+
+## Notes
+- API base used in acceptance: https://whatsapp-commerce-concierge-api.vercel.app/
+- Prisma migrations applied prior to deploy; webhook uses rawBody for signature verification.
