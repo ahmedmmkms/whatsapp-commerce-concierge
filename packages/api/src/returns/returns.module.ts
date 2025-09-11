@@ -7,6 +7,6 @@ import { ReturnsService } from './returns.service.js';
   imports: [PrismaModule],
   controllers: [ReturnsController],
   providers: [ReturnsService],
+  exports: [ReturnsService],
 })
 export class ReturnsModule {}
-
