@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @ApiTags('Orders')
@@ -12,7 +11,6 @@ export class OrdersController {
   @ApiOperation({ summary: 'List recent orders by phone (E.164)' })
   @ApiQuery({ name: 'phone', required: true })
   @ApiOkResponse({ description: 'Orders list (redacted)' })
-  @Throttle(5, 60)
   async listByPhone(@Query('phone') phone?: string) {
     if (!phone) {
       return { ok: false, error: 'missing phone' };
