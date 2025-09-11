@@ -27,9 +27,8 @@ try {
   # List templates
   $gt = $client.GetAsync("$ApiBase/cms/templates").GetAwaiter().GetResult()
   if ($gt.StatusCode -eq 404) { Info "CMS templates endpoint not implemented yet (404)" }
-  elseif ($gt.IsSuccessStatusCode) {
-    Ok "CMS templates list available"
-  } else { Info "GET /cms/templates returned $([int]$gt.StatusCode) (acceptable if not ready)" }
+  elseif ($gt.IsSuccessStatusCode) { Ok "CMS templates list available" }
+  else { Info "GET /cms/templates returned $([int]$gt.StatusCode) (acceptable until deployed)" }
 
 } catch {
   $fail++
@@ -39,4 +38,3 @@ try {
 }
 
 if ($fail -gt 0) { Write-Host "CMS templates test FAILED with $fail error(s)." -ForegroundColor Red; exit 1 } else { Write-Host "CMS templates test PASSED." -ForegroundColor Green }
-

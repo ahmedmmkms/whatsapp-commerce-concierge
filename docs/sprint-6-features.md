@@ -77,3 +77,10 @@ Owner: AMM
 - Endpoints: Orders lookup by id/phone; Returns create/status; CMS templates CRUD.
 - Data model: Return, ReturnItem, OrderEvent, Template.
 
+## Env Vars
+- `ADMIN_TOKEN`: simple token required in `x-admin-token` header for CMS template writes.
+- `RETURNS_ELIGIBLE_DAYS`: number of days after order creation that returns are allowed (default 30).
+
+## Seeds
+- Templates seed: `pnpm --filter @wcc/api exec node ./scripts/seed-templates.mjs`
+  - Ensure `DATABASE_URL` is configured; run after applying Prisma schema changes.

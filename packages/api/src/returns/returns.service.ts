@@ -8,6 +8,12 @@ export class ReturnsService {
   async create(orderId: string, reason?: string, notes?: string) {
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
     if (!order) return { ok: false, error: 'order_not_found' } as const;
+    // Eligibility window (days since order created)
+    const days = Number.parseInt(process.env.RETURNS_ELIGIBLE_DAYS ?? '30');
+    const cutoff = new Date(order.createdAt.getTime() + days * 24 * 60 * 60 * 1000);
+    if (new Date() > cutoff) {
+      return { ok: false, error: 'not_eligible' } as const;
+    }
     // Simple one-open-return rule
     const open = await this.prisma.return.findFirst({ where: { orderId, status: { in: ['requested', 'approved', 'in_transit'] } } });
     if (open) return { ok: false, error: 'existing_open_return' } as const;
@@ -16,4 +22,3 @@ export class ReturnsService {
     return { ok: true, id: ret.id, rmaCode } as const;
   }
 }
-

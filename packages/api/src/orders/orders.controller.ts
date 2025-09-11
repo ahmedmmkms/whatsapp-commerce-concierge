@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Controller('orders')
@@ -6,6 +7,7 @@ export class OrdersController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
+  @Throttle(5, 60)
   async listByPhone(@Query('phone') phone?: string) {
     if (!phone) {
       return { ok: false, error: 'missing phone' };
