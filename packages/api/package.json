@@ -18,6 +18,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed:electronics": "node scripts/seed-electronics.mjs",
+    "db:seed:templates": "node scripts/seed-templates.mjs",
+    "db:seed:orders": "node scripts/seed-orders.mjs",
     "db:update:images": "node scripts/update-product-images.mjs -f ../../data/product-images.json",
     "images:unsplash:map": "node scripts/fetch-unsplash-images.mjs -o ../../data/product-images.json --limit 100"
   },
@@ -25,6 +27,7 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^6.2.1",
     "@sentry/node": "^8.27.0",
     "class-transformer": "^0.5.1",
@@ -36,7 +39,8 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "@vendia/serverless-express": "^4.10.3",
-    "stripe": "^14.25.0"
+    "stripe": "^14.25.0",
+    "swagger-ui-express": "^4.7.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

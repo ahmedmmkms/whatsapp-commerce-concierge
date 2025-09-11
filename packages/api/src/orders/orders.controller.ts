@@ -1,12 +1,17 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../prisma/prisma.service.js';
 
+@ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
+  @ApiOperation({ summary: 'List recent orders by phone (E.164)' })
+  @ApiQuery({ name: 'phone', required: true })
+  @ApiOkResponse({ description: 'Orders list (redacted)' })
   @Throttle(5, 60)
   async listByPhone(@Query('phone') phone?: string) {
     if (!phone) {
@@ -31,6 +36,7 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get order by id' })
   async get(@Param('id') id: string) {
     const order = await this.prisma.order.findUnique({ where: { id }, include: { items: true, payments: true, address: true } });
     if (!order) return { ok: false, error: 'not found' };

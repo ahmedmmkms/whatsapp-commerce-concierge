@@ -6,6 +6,7 @@ import { json } from 'express';
 import { requestIdMiddleware } from './common/request-id.middleware.js';
 import { LoggingInterceptor } from './common/logging.interceptor.js';
 import * as Sentry from '@sentry/node';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 export async function createApp() {
   const app = await NestFactory.create(AppModule);
@@ -40,6 +41,14 @@ export async function createApp() {
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalInterceptors(new LoggingInterceptor());
+  // OpenAPI
+  const config = new DocumentBuilder()
+    .setTitle('WhatsApp Commerce Concierge API')
+    .setDescription('OpenAPI for Orders, Returns, CMS, Checkout, Catalog, and WhatsApp webhook')
+    .setVersion('0.1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
   // For serverless usage, initialize the app without listening on a port
   await app.init();
   return app;

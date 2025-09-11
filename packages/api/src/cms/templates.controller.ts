@@ -1,45 +1,49 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AdminTokenGuard } from '../common/admin-token.guard.js';
+import { CreateTemplateDto } from './dto/create-template.dto.js';
+import { UpdateTemplateDto } from './dto/update-template.dto.js';
 
+@ApiTags('CMS')
 @Controller('cms/templates')
 export class TemplatesController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
+  @ApiOperation({ summary: 'List active templates' })
+  @ApiOkResponse({ description: 'Active templates' })
   async list() {
     const templates = await this.prisma.template.findMany({ where: { isActive: true } });
     return { ok: true, templates };
   }
 
-  private isAdmin(token?: string) {
-    const expected = process.env.ADMIN_TOKEN || process.env.CMS_ADMIN_TOKEN;
-    return expected && token && token === expected;
-  }
-
   @Post()
-  async create(@Headers('x-admin-token') token: string, @Body() body: any) {
-    if (!this.isAdmin(token)) return { ok: false, error: 'forbidden' };
-    const { key, locale, channel, body: tplBody, variables, isActive = true, updatedBy } = body ?? {};
-    if (!key || !locale || !channel || !tplBody) return { ok: false, error: 'invalid' };
+  @UseGuards(AdminTokenGuard)
+  @ApiOperation({ summary: 'Create or upsert a template' })
+  async create(@Body() dto: CreateTemplateDto) {
     const tpl = await this.prisma.template.upsert({
-      where: { key_locale_channel: { key, locale, channel } },
-      update: { body: tplBody, variables, isActive, updatedBy },
-      create: { key, locale, channel, body: tplBody, variables, isActive, updatedBy },
+      where: { key_locale_channel: { key: dto.key, locale: dto.locale, channel: dto.channel } },
+      update: { body: dto.body, variables: dto.variables, isActive: dto.isActive ?? true, updatedBy: dto.updatedBy },
+      create: { key: dto.key, locale: dto.locale, channel: dto.channel, body: dto.body, variables: dto.variables, isActive: dto.isActive ?? true, updatedBy: dto.updatedBy },
     });
     return { ok: true, template: tpl };
   }
 
   @Put(':id')
-  async update(@Headers('x-admin-token') token: string, @Param('id') id: string, @Body() body: any) {
-    if (!this.isAdmin(token)) return { ok: false, error: 'forbidden' };
-    const { body: tplBody, variables, isActive, updatedBy } = body ?? {};
-    const tpl = await this.prisma.template.update({ where: { id }, data: { body: tplBody, variables, isActive, updatedBy } });
+  @UseGuards(AdminTokenGuard)
+  @ApiOperation({ summary: 'Update a template by ID' })
+  @ApiParam({ name: 'id' })
+  async update(@Param('id') id: string, @Body() dto: UpdateTemplateDto) {
+    const tpl = await this.prisma.template.update({ where: { id }, data: { body: dto.body, variables: dto.variables, isActive: dto.isActive, updatedBy: dto.updatedBy } });
     return { ok: true, template: tpl };
   }
 
   @Delete(':id')
-  async remove(@Headers('x-admin-token') token: string, @Param('id') id: string) {
-    if (!this.isAdmin(token)) return { ok: false, error: 'forbidden' };
+  @UseGuards(AdminTokenGuard)
+  @ApiOperation({ summary: 'Delete a template by ID' })
+  @ApiParam({ name: 'id' })
+  async remove(@Param('id') id: string) {
     await this.prisma.template.delete({ where: { id } });
     return { ok: true };
   }
