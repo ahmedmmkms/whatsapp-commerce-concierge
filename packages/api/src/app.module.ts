@@ -12,6 +12,7 @@ import { CheckoutModule } from './checkout/checkout.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { ReturnsModule } from './returns/returns.module.js';
 import { CmsModule } from './cms/cms.module.js';
+import { ComplianceModule } from './compliance/compliance.module.js';
 
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -31,6 +32,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     OrdersModule,
     ReturnsModule,
     CmsModule,
+    ComplianceModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

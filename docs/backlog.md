@@ -67,11 +67,31 @@
 
 ## Sprint 7
 - [Sprint 7] Perf/load testing and tuning
-  - Indexes, cache TTLs, P95 targets.
+  - k6/Artillery load tests for `/webhook/whatsapp`, `/products`, `/cart/*`, `/checkout/init`, `/orders/*` with thresholds.
+  - DB indexes review (e.g., orders by phone, returns by orderId) and migrations.
+  - Redis cache policy: TTLs for catalog/product and idempotency windows; config toggles.
+  - Perf budgets: enforce P95 targets in CI smoke.
 - [Sprint 7] Reliability hardening
-  - Circuit breakers, retries/backoff, DLQs, backups.
-- [Sprint 7] Compliance + UAT + pilot
-  - PDPL workflows, privacy notices, UAT checklist pass.
+  - Timeouts, retries/backoff on external I/O (Stripe, DB, Redis, webhooks).
+  - Circuit breakers for Stripe and WhatsApp outbound with graceful degradation.
+  - BullMQ DLQs with retry policies and alerting; operational dashboards.
+  - Backups + restore drill (Neon logical backup, Upstash snapshot); document RPO/RTO.
+- [Sprint 7] Compliance (PDPL)
+  - Data export job + signed, expiring download link; audit entries.
+  - Delete/redaction workflow (soft-delete + background redaction) with audit.
+  - Consent logs review and export for audit; privacy notices (web + WA templates).
+- [Sprint 7] UAT & Pilot
+  - UAT checklist and evidence; Arabic/English end-to-end cases.
+  - Feature flags for pilot cohort; rollback test to previous tag.
+  - WhatsApp number migration playbook (senders, templates, verification, fallback).
+- [Sprint 7] Ops & Docs
+  - Dashboards: SLA, P95 per route, and funnel (view → cart → checkout → pay).
+  - Alerts for 5xx spikes, webhook failures, DLQ growth, Stripe signature failures.
+  - OpenAPI finalize with examples; support SOP and incident runbooks.
+- [Sprint 7] Support page robustness
+  - Better error states, i18n messages, and correlation ID display for support triage.
+- [Sprint 7] Scripts
+  - Add `scripts/sprint7-smoke.ps1` and `scripts/sprint7-acceptance.ps1` (aggregate perf/compliance checks).
 
 ## Sprint 8
 - [Sprint 8] UI Polish (Support + WA templates)
