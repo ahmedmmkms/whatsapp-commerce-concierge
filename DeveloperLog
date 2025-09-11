@@ -247,6 +247,16 @@ Backlog (Post-MVP)
 - Action also generates Prisma Client before deploy.
 
 
+== 0025: Sprint 6 Planning Artifacts ==
+- Added docs/sprint-6-features.md detailing scope (Orders, Returns, basic CMS, support page), endpoints, data models, flows, testing.
+- Expanded docs/backlog.md Sprint 6 section with actionable sub-tasks (orders by id/phone, returns eligibility + RMA, CMS templates CRUD, support page, metrics/logs, docs).
+- Added acceptance runners and smoke scripts for Sprint 6:
+  - scripts/sprint6-acceptance.ps1 (aggregates smoke + focused tests)
+  - scripts/sprint6-smoke.ps1 (creates COD order, checks lookups, tries returns)
+  - scripts/sprint6/test-orders-lookup.ps1, test-returns-create.ps1, test-cms-templates.ps1
+- Note: scripts are endpoint-aware and degrade gracefully if not yet implemented (404 tolerated with info logs).
+
+
 
 == 0025: Neon Detailed Guide ==
 - Added docs/neon-setup.md with production-first Neon instructions (pooler, roles, Prisma params, CI).

@@ -44,13 +44,26 @@
 
 ## Sprint 6
 - [Sprint 6] Orders API
-  - `/orders/{id}` and by phone lookup; status events.
+  - `GET /orders/:id` (support-safe, redacted PII); include items snapshot and status.
+  - `GET /orders?phone=E164` (rate-limited) returns recent orders summary.
+  - Order timeline events (status_changed, webhook) persisted for audit.
+  - Emit/order status events on COD confirm and Stripe webhook transitions.
 - [Sprint 6] Returns API + flow
-  - `/returns` create/status; RMA guidance messages.
-- [Sprint 6] Basic CMS for quick replies
-  - CRUD simple templates; AR/EN content.
+  - Models: Return, ReturnItem; statuses `requested|approved|rejected|in_transit|received|refunded`.
+  - `POST /returns` with eligibility checks (window, one-open-return rule); generate RMA.
+  - `GET /returns/:id`, `GET /returns?orderId=...` for status queries.
+  - Guardrails: rate-limit by phone/order; basic abuse mitigation.
+- [Sprint 6] Basic CMS (quick replies/templates)
+  - CRUD minimal Template model (key, locale, channel, body, variables, isActive).
+  - Seed AR/EN templates: order_status, start_return, rma_instructions, human_handoff.
+  - Resolve templates in WA flows with variable interpolation + locale fallback.
 - [Sprint 6] Support web page (order lookup)
-  - Minimal page for support team.
+  - Next.js route `/support/order-lookup` (phone + orderId); calls Orders API; RTL + AR copy.
+  - Anti-enumeration: simple throttling/captcha; handle API errors gracefully.
+- [Sprint 6] Tests/Docs/Obs (lightweight)
+  - Update OpenAPI for new endpoints; add acceptance scripts under `scripts/`.
+  - Metrics: orders_by_status, returns_by_status; logs for template/intent/rate-limit.
+  - Docs: `docs/sprint-6-features.md`; runbook notes for returns eligibility + templates.
 
 ## Sprint 7
 - [Sprint 7] Perf/load testing and tuning
