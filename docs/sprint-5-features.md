@@ -57,6 +57,14 @@ Owner: TBD
   - No sensitive card data persisted; Stripe signature verified.
   - P95 checkout init < 250ms (excluding provider redirect).
 
+## Test Scripts (PowerShell)
+- `scripts/sprint5-acceptance.ps1` – runs all sprint 5 tests. Example:
+  - `pwsh scripts/sprint5-acceptance.ps1 -ApiBase http://localhost:3001 -DoStripe`
+- `scripts/sprint5-smoke.ps1` – quick COD smoke and optional Stripe URL check.
+- `scripts/sprint5/test-cod-checkout.ps1` – focused COD flow.
+- `scripts/sprint5/test-address-validation.ps1` – ensures DTO validation returns 400 for missing fields.
+- `scripts/sprint5/test-stripe-init.ps1` – verifies Stripe checkout URL when configured.
+
 ## Risks & Mitigations
 - Webhook delivery timing: idempotent processors, retries with backoff, DLQ on repeated failures.
 - Misconfiguration of secrets: explicit startup checks; robust error logs with request-id.
