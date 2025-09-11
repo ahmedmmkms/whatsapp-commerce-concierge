@@ -8,6 +8,8 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { ConsentModule } from './consent/consent.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { CartModule } from './cart/cart.module.js';
+import { CheckoutModule } from './checkout/checkout.module.js';
+import { OrdersModule } from './orders/orders.module.js';
 
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -23,6 +25,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     ConsentModule,
     CatalogModule,
     CartModule,
+    CheckoutModule,
+    OrdersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -35,7 +35,8 @@
     "ioredis": "^5.4.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "@vendia/serverless-express": "^4.10.3"
+    "@vendia/serverless-express": "^4.10.3",
+    "stripe": "^14.25.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

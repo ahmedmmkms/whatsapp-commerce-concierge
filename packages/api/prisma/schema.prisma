@@ -22,6 +22,7 @@ model Customer {
   conversations Conversation[]
   consents      Consent[]
   carts         Cart[]
+  orders        Order[]
 
   @@unique([waPhone])
 }
@@ -38,6 +39,7 @@ model Conversation {
   lastMessageAt DateTime?
   state        String?    @db.VarChar(64)
   carts        Cart[]
+  orders      Order[]
 
   @@unique([customerId])
 }
@@ -93,6 +95,7 @@ model Product {
 
   media       ProductMedia[]
   cartItems   CartItem[]
+  orderItems  OrderItem[]
 
   @@index([categoryId])
   @@index([name])
@@ -146,6 +149,7 @@ model Cart {
   expiresAt      DateTime?
 
   items          CartItem[]
+  orders         Order[]
 
   @@index([customerId, status])
 }
@@ -171,4 +175,98 @@ model CartItem {
   @@unique([cartId, productId])
   @@index([cartId])
   @@index([cartId, sku])
+}
+
+// Sprint 5: Checkout/Orders/Payments
+
+model Address {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  name        String?   @db.VarChar(128)
+  phone       String?   @db.VarChar(32)
+  line1       String    @db.VarChar(256)
+  line2       String?   @db.VarChar(256)
+  city        String    @db.VarChar(128)
+  region      String?   @db.VarChar(128)
+  country     String    @db.VarChar(2)
+  postalCode  String?   @db.VarChar(32)
+
+  orders      Order[]
+}
+
+model Order {
+  id             String       @id @default(uuid())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  customerId     String
+  customer       Customer     @relation(fields: [customerId], references: [id])
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  cartId         String?
+  cart           Cart?        @relation(fields: [cartId], references: [id])
+
+  addressId      String?
+  address        Address?     @relation(fields: [addressId], references: [id])
+
+  currency       String       @db.VarChar(8)
+  subtotalMinor  Int          @default(0)
+  taxMinor       Int          @default(0)
+  shippingMinor  Int          @default(0)
+  totalMinor     Int          @default(0)
+
+  status         String       @db.VarChar(24) @default("pending") // pending|pending_cod|confirmed|paid|canceled|failed
+  paymentState   String?      @db.VarChar(24)
+
+  externalPaymentId String?   @unique
+  metadata       Json?
+
+  items          OrderItem[]
+  payments       Payment[]
+
+  @@index([customerId, createdAt])
+}
+
+model OrderItem {
+  id                 String   @id @default(uuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  orderId            String
+  order              Order    @relation(fields: [orderId], references: [id])
+
+  productId          String?
+  product            Product? @relation(fields: [productId], references: [id])
+
+  sku                String   @db.VarChar(64)
+  nameSnapshot       String   @db.VarChar(256)
+  priceSnapshotMinor Int
+  currency           String   @db.VarChar(8)
+  qty                Int
+  lineTotalMinor     Int      @default(0)
+
+  @@index([orderId])
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id])
+
+  provider      String   @db.VarChar(16) // stripe|cod
+  intentId      String?  @unique
+  status        String   @db.VarChar(24) // requires_action|processing|succeeded|failed|canceled|pending
+  amountMinor   Int
+  currency      String   @db.VarChar(8)
+  attempts      Int      @default(0)
+  lastError     String?  @db.Text
+
+  @@index([orderId, provider])
 }

@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { StripeController } from './stripe.controller.js';
+import { OrdersController } from './orders.controller.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [StripeController],
+  controllers: [OrdersController],
 })
-export class StripeModule {}
+export class OrdersModule {}
+
