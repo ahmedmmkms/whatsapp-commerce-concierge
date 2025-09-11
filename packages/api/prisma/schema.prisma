@@ -227,6 +227,8 @@ model Order {
 
   items          OrderItem[]
   payments       Payment[]
+  returns        Return[]
+  events         OrderEvent[]
 
   @@index([customerId, createdAt])
 }
