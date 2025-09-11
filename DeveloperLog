@@ -433,3 +433,14 @@ t- Testing: Unit for CartService and utils; E2E for lifecycle/idempotency; concu
 - Caching: Catalog TTLs configurable via CACHE_TTL_PRODUCTS_SEC and CACHE_TTL_CATEGORIES_SEC.
 - Scripts: Added scripts/sprint7-acceptance.ps1 (runs smoke + PDPL + perf thresholds), scripts/sprint7-smoke.ps1, scripts/sprint7/test-pdpl.ps1, scripts/sprint7/test-perf-thresholds.ps1.
 - Docs: docs/sprint-7-features.md updated to reflect MVP PDPL and cache envs.
+
+== 0042: Sprint 7 – Completed (Hardening, UAT Prep) ==
+- PDPL: Inline export and admin delete/redaction delivered. Added `ComplianceAudit` table and customer redaction flags.
+- Reliability: WhatsApp sender + Stripe circuit breakers; retries/backoff and cooldown envs added.
+- Ops: Route metrics endpoint `/health/metrics`; DLQ utilities under `/queue/*` (stats/requeue/mirror).
+- Performance: Added `Return(orderId, createdAt)` index; catalog cache TTLs configurable.
+- Load/Perf: k6 and Artillery profiles added; perf threshold script validates P95 for products/cart/checkout.
+- Scripts: Sprint 7 smoke/acceptance runners; rollback validator script.
+- Docs: Sprint 7 features marked Completed; WhatsApp number migration playbook added.
+- Acceptance: `scripts/sprint7-acceptance.ps1 -ApiBase https://whatsapp-commerce-concierge-api.vercel.app` PASSED post-migrations.
+- Next: wire CI checks for perf thresholds and optional k6/artillery artifact upload; feature flags for pilot cohort (PILOT_WHITELIST).

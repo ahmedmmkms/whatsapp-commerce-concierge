@@ -1,8 +1,8 @@
 # Sprint 7 Features - Hardening, UAT, Pilot Go-Live
 
-Date: 2025-10-?? (planned)
+Date: 2025-10-?? (completed)
 Owner: AMM
-Status: Planned
+Status: Completed
 
 ## Scope
 - Performance/load testing and tuning for pilot traffic; meet P95 targets.
@@ -69,6 +69,14 @@ Status: Planned
   - `scripts/sprint7-acceptance.ps1` aggregates smoke and targeted verifications.
   - `scripts/sprint7/test-perf-thresholds.ps1` asserts basic P95 limits.
   - Load: `scripts/load/k6-baseline.js` and `scripts/load/artillery-browse-checkout.yml` for realistic profiles.
+
+## Acceptance Summary
+- API: https://whatsapp-commerce-concierge-api.vercel.app
+- Result: PASSED via `scripts/sprint7-acceptance.ps1`
+  - PDPL: `GET /compliance/pdpl/status` OK, export returns data for seeded users, delete/redaction updates Customer and Address, audit logged.
+  - Reliability: WhatsApp sender and Stripe circuit breakers verified with induced failures; recover after cooldown.
+  - DLQ: `/queue/dlq/stats` OK; admin requeue/mirror endpoints functional.
+  - Metrics: `/health/metrics` exposes p95 estimates per route; thresholds validated with `test-perf-thresholds.ps1`.
 
 ## Rollout
 - Stage first; monitor dashboards and alerts; enable pilot via feature flags.
