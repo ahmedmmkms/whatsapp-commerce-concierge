@@ -1,22 +1,22 @@
-# Backlog â€“ Revised (Web Frontend as Sprint 4)
+# Backlog — Issues by Sprint (Copy into GitHub)
 
 ## Sprint 1
 - [Sprint 1] WhatsApp webhook verify + message ingest
-  - GET verify, POST ingest; basic logging/ack.
+  - Build `/webhook/whatsapp` GET verify + POST ingest; unit tests; fixtures.
 - [Sprint 1] Choose ORM + migrations + seeds
-  - Decide between Prisma/TypeORM; create initial schema and seed.
+  - Pick Prisma/TypeORM; add Conversation/Customer; migration workflow.
 - [Sprint 1] Redis + BullMQ wiring
-  - Queue module; health endpoint.
+  - Queue module; retry/backoff defaults; health endpoint.
 - [Sprint 1] PDPL consent capture
-  - Consent endpoint + storage; per-phone.
+  - Consent model, storage, retrieval; audit trail; policy text.
 - [Sprint 1] Observability baseline
-  - Request IDs, logging interceptor, Sentry placeholder.
+  - Request logging, error handler, trace IDs; dashboard sketches.
 
 ## Sprint 2
 - [Sprint 2] Catalog ingestion job
-  - Seed demo categories/products; nightly sync placeholder.
+  - Ingest demo feed; nightly sync; seed fallback.
 - [Sprint 2] Product query API
-  - `/products` list + `/products/:id` detail; pagination/search.
+  - `/products` with search/filter/sort; Redis cache.
 - [Sprint 2] WA browse intents (AR/EN)
   - Categories, product details, quick replies.
 - [Sprint 2] Web preview for QA
@@ -31,41 +31,36 @@
   - Tax/shipping placeholders; currency utils.
 
 ## Sprint 4
-- [Sprint 4] Web frontend MVP (AR/EN + RTL)
-  - Home, categories, product list/detail; client search/filters; WA deeplinks; analytics events.
-
-## Sprint 5
-- [Sprint 5] Payments abstraction + COD
+- [Sprint 4] Payments abstraction + COD
   - Checkout init/confirm; order reserve; COD path.
-- [Sprint 5] Stripe adapter + webhook
-  - Payment link/handoff; signature verification; retries/idempotency.
-- [Sprint 5] Address capture dialog
+- [Sprint 4] Stripe adapter + webhook
+  - Payment link/handoff; webhook verification; retries.
+- [Sprint 4] Address capture dialog
   - Validate + store address; order notes.
 
-## Sprint 6
-- [Sprint 6] Orders API
+## Sprint 5
+- [Sprint 5] Orders API
   - `/orders/{id}` and by phone lookup; status events.
-- [Sprint 6] Returns API + flow
+- [Sprint 5] Returns API + flow
   - `/returns` create/status; RMA guidance messages.
-- [Sprint 6] Basic CMS for quick replies
+- [Sprint 5] Basic CMS for quick replies
   - CRUD simple templates; AR/EN content.
-- [Sprint 6] Support web page (order lookup)
+- [Sprint 5] Support web page (order lookup)
   - Minimal page for support team.
 
-## Sprint 7
-- [Sprint 7] Perf/load testing and tuning
+## Sprint 6
+- [Sprint 6] Perf/load testing and tuning
   - Indexes, cache TTLs, P95 targets.
-- [Sprint 7] Reliability hardening
+- [Sprint 6] Reliability hardening
   - Circuit breakers, retries/backoff, DLQs, backups.
-- [Sprint 7] Compliance + UAT + pilot
+- [Sprint 6] Compliance + UAT + pilot
   - PDPL workflows, privacy notices, UAT checklist pass.
-
 ---
 ## Bootstrap to GitHub
 Requires: Personal Access Token with repo scope in `GITHUB_TOKEN`.
 
-Dry run (offline, no API calls):
-`pwsh scripts/bootstrap-github-work-items.ps1 -DryRun -Offline -OnlySprint 5 -Owner you -Repo yourrepo`
+Dry run:
+`pwsh scripts/bootstrap-github-work-items.ps1 -DryRun`
 
 Create milestones/issues (start date optional):
 `pwsh scripts/bootstrap-github-work-items.ps1 -StartDate 2025-09-15`
@@ -78,5 +73,5 @@ Labels
 
 Windows PowerShell (no pwsh)
 - Set token: `$env:GITHUB_TOKEN = '<YOUR_PAT_WITH_repo_scope>'`
-- One-shot run: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\bootstrap-github-work-items.ps1 -DryRun -Offline -OnlySprint 5 -Owner you -Repo yourrepo`
-- Or run in session: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; .\scripts\bootstrap-github-work-items.ps1 -DryRun -Offline -OnlySprint 5 -Owner you -Repo yourrepo`
+- One-shot run: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\bootstrap-github-work-items.ps1 -DryRun`
+- Or run in session: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; .\scripts\bootstrap-github-work-items.ps1 -DryRun`
