@@ -1,7 +1,8 @@
 # Sprint 6 Features - Orders, Returns, Basic CMS, Support Page
 
-Date: 2025-10-??
+Date: 2025-10-?? (completed)
 Owner: AMM
+Status: Completed
 
 ## Scope
 - Orders and returns user flows exposed via API and WhatsApp.
@@ -84,3 +85,11 @@ Owner: AMM
 ## Seeds
 - Templates seed: `pnpm --filter @wcc/api exec node ./scripts/seed-templates.mjs`
   - Ensure `DATABASE_URL` is configured; run after applying Prisma schema changes.
+
+## Acceptance Summary
+- API: https://whatsapp-commerce-concierge-api.vercel.app
+- Result: PASSED via `scripts/sprint6-acceptance.ps1`
+  - Orders: `GET /orders/:id` and `GET /orders?phone=...` OK.
+  - Returns: `POST /returns` OK (handles `existing_open_return` / `not_eligible`), `GET /returns?orderId=...` OK.
+  - CMS: `GET /cms/templates` OK.
+  - WA intents: status/return/agent reply using seeded templates (preview endpoint).

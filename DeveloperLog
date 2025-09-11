@@ -265,6 +265,15 @@ Backlog (Post-MVP)
 - Updated WhatsappModule to import Prisma, Returns, and CMS modules.
 - Note: requires deploy to Vercel API and templates seeded to see in /whatsapp/preview.
 
+== 0027: Sprint 6 Completed ==
+- Scope delivered: Orders lookup (by id/phone), Returns API (create/status/list with eligibility + one-open rule), basic CMS templates CRUD + list, Swagger docs, support web page for order lookup, WA intents wired to templates (status/return/agent).
+- Data: Added Prisma models (Return, ReturnItem, OrderEvent, Template) and migration `20250911_sprint6_returns_templates`.
+- Env: Added `ADMIN_TOKEN` (CMS writes), `RETURNS_ELIGIBLE_DAYS` (default 30). Optional: `PRISMA_LOG` for diagnostics; set `CACHE_DISABLED=1` if Redis absent.
+- Deployment: API deployed to Vercel; DB deploy succeeded; templates seeded. Swagger at `/docs`.
+- Acceptance: `scripts/sprint6-acceptance.ps1 -ApiBase https://whatsapp-commerce-concierge-api.vercel.app` PASSED (orders OK, returns OK incl. existing_open_return handling, CMS list OK).
+- Aggregated runner added: `scripts/acceptance-all.ps1` (Sprints 1–6). Sprint 1 step requires WebOrigin/VerifyToken (or use -SkipSignature).
+- Notes: Support page `/support/order-lookup` minimal; polish moved to Sprint 8. Products listing hardened to degrade gracefully on transient DB errors.
+
 
 
 == 0025: Neon Detailed Guide ==
