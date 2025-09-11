@@ -31,7 +31,13 @@ $ErrorActionPreference = 'Stop'
 
 function New-HttpClient { [System.Net.Http.HttpClient]::new() }
 function New-JsonContent([string]$s) { New-Object System.Net.Http.StringContent($s, [Text.Encoding]::UTF8, 'application/json') }
-function p95($arr) { $sorted = $arr | Sort-Object; $idx = [Math]::Ceiling($sorted.Count * 0.95) - 1; if ($idx -lt 0) { $idx = 0 }; return [int]$sorted[$idx] }
+function p95($arr) {
+  $sorted = @($arr | Sort-Object)
+  if ($sorted.Length -eq 0) { return 0 }
+  $idx = [Math]::Ceiling($sorted.Length * 0.95) - 1
+  if ($idx -lt 0) { $idx = 0 }
+  return [int]$sorted[$idx]
+}
 function measure([ScriptBlock]$action) { $sw = [System.Diagnostics.Stopwatch]::StartNew(); & $action; $sw.Stop(); return [int]$sw.ElapsedMilliseconds }
 
 if ($ApiBase.EndsWith('/')) { $ApiBase = $ApiBase.TrimEnd('/') }
@@ -81,4 +87,3 @@ try {
 } finally {
   $client.Dispose()
 }
-

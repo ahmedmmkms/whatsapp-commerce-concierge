@@ -10,7 +10,7 @@ export class ComplianceService {
       ok: true,
       pdpl: {
         exportSupported: true,
-        deleteSupported: false, // planned: redaction/soft-delete workflow
+        deleteSupported: true,
       },
     } as const;
   }
