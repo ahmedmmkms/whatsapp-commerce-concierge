@@ -270,3 +270,67 @@ model Payment {
 
   @@index([orderId, provider])
 }
+
+// Sprint 6: Returns, Order Events, Templates (CMS)
+
+model Return {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+
+  status     String   @db.VarChar(24) // requested|approved|rejected|in_transit|received|refunded
+  reason     String?  @db.VarChar(128)
+  notes      String?  @db.Text
+  rmaCode    String   @unique @db.VarChar(32)
+
+  items      ReturnItem[]
+
+  @@index([orderId, status])
+}
+
+model ReturnItem {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  returnId   String
+  ret        Return   @relation(fields: [returnId], references: [id])
+
+  orderItemId String?
+  sku        String?  @db.VarChar(64)
+  qty        Int      @default(1)
+
+  @@index([returnId])
+}
+
+model OrderEvent {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+
+  type       String   @db.VarChar(32) // status_changed|note|webhook
+  payload    Json?
+
+  @@index([orderId, createdAt])
+}
+
+model Template {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  key        String   @db.VarChar(64)
+  locale     String   @db.VarChar(8) // ar|en
+  channel    String   @db.VarChar(8) // wa|web
+  body       String   @db.Text
+  variables  Json?
+  isActive   Boolean  @default(true)
+  updatedBy  String?  @db.VarChar(64)
+
+  @@unique([key, locale, channel])
+}

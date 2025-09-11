@@ -10,6 +10,8 @@ import { CatalogModule } from './catalog/catalog.module.js';
 import { CartModule } from './cart/cart.module.js';
 import { CheckoutModule } from './checkout/checkout.module.js';
 import { OrdersModule } from './orders/orders.module.js';
+import { ReturnsModule } from './returns/returns.module.js';
+import { CmsModule } from './cms/cms.module.js';
 
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -27,6 +29,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     CartModule,
     CheckoutModule,
     OrdersModule,
+    ReturnsModule,
+    CmsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

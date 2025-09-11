@@ -1,9 +1,32 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private prisma: PrismaService) {}
+
+  @Get()
+  async listByPhone(@Query('phone') phone?: string) {
+    if (!phone) {
+      return { ok: false, error: 'missing phone' };
+    }
+    // Find customer by WA phone and return recent orders in redacted summary
+    const customer = await this.prisma.customer.findUnique({ where: { waPhone: phone } });
+    if (!customer) return { ok: true, orders: [] };
+    const orders = await this.prisma.order.findMany({
+      where: { customerId: customer.id },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        createdAt: true,
+        status: true,
+        totalMinor: true,
+        currency: true,
+      },
+    });
+    return { ok: true, orders };
+  }
 
   @Get(':id')
   async get(@Param('id') id: string) {
@@ -12,4 +35,3 @@ export class OrdersController {
     return { ok: true, order };
   }
 }
-

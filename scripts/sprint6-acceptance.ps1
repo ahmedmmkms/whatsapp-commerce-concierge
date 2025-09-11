@@ -16,16 +16,16 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Run($title, $script, $args) {
+function Run($title, $script, $parameters) {
   Write-Host "=== $title ===" -ForegroundColor Yellow
-  & pwsh -NoProfile -File $script @args
-  if ($LASTEXITCODE -ne 0) { throw "$title failed ($LASTEXITCODE)" }
+  if ([System.IO.Path]::IsPathRooted($script)) { $path = $script } else { $path = Join-Path $PSScriptRoot $script }
+  & $path @parameters
+  if (-not $?) { throw "$title failed" }
 }
 
-Run 'Sprint 6 Smoke' 'scripts/sprint6-smoke.ps1' @{ ApiBase = $ApiBase }
-Run 'Orders Lookup' 'scripts/sprint6/test-orders-lookup.ps1' @{ ApiBase = $ApiBase }
-Run 'Returns Create' 'scripts/sprint6/test-returns-create.ps1' @{ ApiBase = $ApiBase }
-Run 'CMS Templates' 'scripts/sprint6/test-cms-templates.ps1' @{ ApiBase = $ApiBase }
+Run 'Sprint 6 Smoke' 'sprint6-smoke.ps1' @{ ApiBase = $ApiBase }
+Run 'Orders Lookup' 'sprint6/test-orders-lookup.ps1' @{ ApiBase = $ApiBase }
+Run 'Returns Create' 'sprint6/test-returns-create.ps1' @{ ApiBase = $ApiBase }
+Run 'CMS Templates' 'sprint6/test-cms-templates.ps1' @{ ApiBase = $ApiBase }
 
 Write-Host "All Sprint 6 acceptance tests PASSED" -ForegroundColor Green
-
