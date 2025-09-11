@@ -64,7 +64,9 @@ try {
     Info "POST /returns not implemented yet (404)."
   } elseif ($rt.IsSuccessStatusCode) {
     $ret = $rt.Content.ReadAsStringAsync().Result | ConvertFrom-Json
-    if ($ret.id) { Ok "Return created (id $($ret.id))" } else { Ok "Return create responded OK" }
+    if ($ret.ok -and $ret.id) { Ok "Return created (id $($ret.id))" }
+    elseif (-not $ret.ok -and ($ret.error -eq 'existing_open_return' -or $ret.error -eq 'not_eligible')) { Info "Return not created ($($ret.error))" }
+    else { Info "Return create responded: $($rt.Content.ReadAsStringAsync().Result)" }
   } else {
     Info "Returns create responded $([int]$rt.StatusCode) (acceptable if not ready)."
   }
@@ -77,4 +79,3 @@ try {
 }
 
 if ($fail -gt 0) { Write-Host "Sprint 6 smoke FAILED with $fail error(s)." -ForegroundColor Red; exit 1 } else { Write-Host "Sprint 6 smoke PASSED." -ForegroundColor Green }
-

@@ -44,7 +44,9 @@ try {
   if ($rt.StatusCode -eq 404) { Info "POST /returns not implemented yet (404)" }
   elseif ($rt.IsSuccessStatusCode) {
     $ret = $rt.Content.ReadAsStringAsync().Result | ConvertFrom-Json
-    if ($ret.id) { Ok "Return created (id $($ret.id))" } else { Ok "Return create responded OK" }
+    if ($ret.ok -and $ret.id) { Ok "Return created (id $($ret.id))" }
+    elseif (-not $ret.ok -and ($ret.error -eq 'existing_open_return' -or $ret.error -eq 'not_eligible')) { Ok "Return not created ($($ret.error)) as expected" }
+    else { Ok "Return responded: $($rt.Content.ReadAsStringAsync().Result)" }
   } else { Info "Returns create returned $([int]$rt.StatusCode) (acceptable until deployed)" }
 
 } catch {
