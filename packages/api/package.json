@@ -17,7 +17,9 @@
     "db:push": "prisma db push",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "db:seed:electronics": "node scripts/seed-electronics.mjs"
+    "db:seed:electronics": "node scripts/seed-electronics.mjs",
+    "db:update:images": "node scripts/update-product-images.mjs -f ../../data/product-images.json",
+    "images:unsplash:map": "node scripts/fetch-unsplash-images.mjs -o ../../data/product-images.json --limit 100"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -48,4 +50,3 @@
     "ts-jest": "^29.2.5"
   }
 }
-
