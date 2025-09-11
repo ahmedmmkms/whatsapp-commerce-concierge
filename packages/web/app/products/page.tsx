@@ -1,8 +1,12 @@
 import ProductsClient from '../../components/products-client'
 
 async function getApiBase() {
-  if (process.env.NEXT_PUBLIC_API_URL) return '/api'
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
+  // Use an absolute API URL on the server to avoid Invalid URL for '/api/*'
+  return (
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'http://localhost:3001'
+  )
 }
 
 async function getProducts(searchParams: { [key: string]: string | string[] | undefined }) {
