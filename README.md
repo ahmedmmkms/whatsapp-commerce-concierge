@@ -85,17 +85,15 @@ The backend follows a layered approach (controllers, services, modules) with Pri
 
 ```mermaid
 flowchart LR
-  U[User (Web/WhatsApp)] -->|Web| W[Next.js (Web)]
-  U -->|WA| H[WhatsApp Webhook]
-  W -->|REST| A[NestJS API]
+  U[User (Web/WhatsApp)] --> W[Next.js (Web)]
+  U --> H[WhatsApp Webhook]
+  W --> A[NestJS API]
   H --> A
   A --> S[Services (Orders/Returns/Cart/Catalog/Checkout/CMS)]
   S --> P[(PostgreSQL via Prisma)]
   S --> R[(Redis Cache/Queues)]
-  S --> ST[Stripe]:::ext
-  S --> WA[WhatsApp Cloud]:::ext
-
-  classDef ext fill:#fff,stroke:#999,stroke-dasharray: 3 3
+  S --> ST[Stripe]
+  S --> WA[WhatsApp Cloud]
 ```
 
 ## Directory Structure
