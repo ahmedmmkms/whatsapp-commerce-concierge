@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
+import { useI18n } from "../../../components/i18n/provider";
 
 type OrderSummary = { id: string; createdAt: string; status: string; totalMinor: number; currency: string };
 
 export default function OrderLookupPage() {
+  const { t } = useI18n()
   const [phone, setPhone] = useState("");
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,18 +46,18 @@ export default function OrderLookupPage() {
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Support: Order Lookup</h1>
+      <h1 className="text-2xl font-semibold">{t('support.title')}</h1>
       <form onSubmit={onLookup} className="space-y-4">
         <div className="space-y-2">
-          <label className="block text-sm">Order ID</label>
+          <label className="block text-sm">{t('support.orderId')}</label>
           <input value={orderId} onChange={(e) => setOrderId(e.target.value)} className="w-full border rounded p-2" placeholder="e.g. uuid" />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm">Phone (E.164)</label>
+          <label className="block text-sm">{t('support.phone')}</label>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded p-2" placeholder="+9665..." />
         </div>
         <button type="submit" disabled={loading} className="bg-black text-white rounded px-4 py-2 disabled:opacity-60">
-          {loading ? "Looking up..." : "Lookup"}
+          {loading ? t('common.loading') : t('support.lookup')}
         </button>
       </form>
 
@@ -74,7 +76,7 @@ export default function OrderLookupPage() {
                 </div>
               ))}
               {result.orders.length === 0 && (
-                <div className="text-sm text-muted-foreground">No orders found for this phone.</div>
+                <div className="text-sm text-muted-foreground">{t('support.noOrders')}</div>
               )}
             </div>
           )}
@@ -87,7 +89,7 @@ export default function OrderLookupPage() {
             </div>
           )}
           {requestId && (
-            <div className="text-xs text-muted-foreground">Request ID: {requestId}</div>
+            <div className="text-xs text-muted-foreground">{t('common.requestId')}: {requestId}</div>
           )}
         </div>
       )}

@@ -1,10 +1,12 @@
 "use client"
 import { useEffect, useState } from 'react'
+import { useI18n } from '../../../components/i18n/provider'
 
 type Template = { id: string, key: string, locale: string, channel: string, body: string, isActive: boolean }
 
 export default function AdminTemplatesPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const { t } = useI18n()
   const [token, setToken] = useState('')
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(false)
@@ -31,10 +33,10 @@ export default function AdminTemplatesPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Templates (Admin)</h1>
+      <h1 className="text-2xl font-semibold">{t('admin.templates.title')}</h1>
       <div className="flex items-center gap-2">
-        <input value={token} onChange={(e) => setToken(e.target.value)} type="password" placeholder="Admin Token" className="w-full border rounded p-2" />
-        <button className="btn btn-outline" onClick={load} disabled={loading}>{loading ? 'Loading…' : 'Refresh'}</button>
+        <input value={token} onChange={(e) => setToken(e.target.value)} type="password" placeholder={t('admin.templates.token')} className="w-full border rounded p-2" />
+        <button className="btn btn-outline" onClick={load} disabled={loading}>{loading ? t('common.loading') : t('admin.templates.refresh')}</button>
       </div>
       {error && <div className="text-red-600 text-sm">{error}</div>}
       <div className="space-y-4">
@@ -43,8 +45,8 @@ export default function AdminTemplatesPage() {
             <div className="font-medium">{t.key} / {t.locale} / {t.channel}</div>
             <textarea className="w-full border rounded p-2 mt-2 min-h-[100px]" value={t.body} onChange={(e) => setTemplates(prev => prev.map(x => x.id === t.id ? { ...x, body: e.target.value } : x))} />
             <div className="mt-2 flex gap-2">
-              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={t.isActive} onChange={(e) => setTemplates(prev => prev.map(x => x.id === t.id ? { ...x, isActive: e.target.checked } : x))} /> Active</label>
-              <button className="btn btn-sm" onClick={() => save(t)}>Save</button>
+              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={t.isActive} onChange={(e) => setTemplates(prev => prev.map(x => x.id === t.id ? { ...x, isActive: e.target.checked } : x))} /> {t('admin.templates.active')}</label>
+              <button className="btn btn-sm" onClick={() => save(t)}>{t('admin.templates.save')}</button>
             </div>
           </div>
         ))}
@@ -52,4 +54,3 @@ export default function AdminTemplatesPage() {
     </div>
   )
 }
-

@@ -1,8 +1,10 @@
 "use client"
 import { useState } from 'react'
+import { useI18n } from '../../../components/i18n/provider'
 
 export default function ReturnsByOrderPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const { t } = useI18n()
   const [orderId, setOrderId] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,10 +27,10 @@ export default function ReturnsByOrderPage() {
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Returns by Order</h1>
+      <h1 className="text-2xl font-semibold">{t('returns.list.title')}</h1>
       <form onSubmit={onLookup} className="flex gap-2">
-        <input value={orderId} onChange={(e) => setOrderId(e.target.value)} className="w-full border rounded p-2" placeholder="Order ID" />
-        <button className="btn" disabled={loading}>{loading ? 'Looking…' : 'Lookup'}</button>
+        <input value={orderId} onChange={(e) => setOrderId(e.target.value)} className="w-full border rounded p-2" placeholder={t('returns.start.orderId')} />
+        <button className="btn" disabled={loading}>{loading ? t('common.loading') : t('support.lookup')}</button>
       </form>
       {error && <div className="text-red-600 text-sm">{error}</div>}
       <div className="space-y-3">
@@ -44,4 +46,3 @@ export default function ReturnsByOrderPage() {
     </div>
   )
 }
-

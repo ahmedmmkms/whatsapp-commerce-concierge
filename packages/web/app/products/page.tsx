@@ -14,8 +14,14 @@ async function getProducts(searchParams: { [key: string]: string | string[] | un
   const qp = new URLSearchParams()
   if (typeof searchParams.q === 'string') qp.set('q', searchParams.q)
   if (typeof searchParams.category === 'string') qp.set('category', searchParams.category)
-  if (typeof searchParams.minPrice === 'string') qp.set('minPrice', searchParams.minPrice)
-  if (typeof searchParams.maxPrice === 'string') qp.set('maxPrice', searchParams.maxPrice)
+  if (typeof searchParams.minPrice === 'string') {
+    const v = Number(searchParams.minPrice)
+    if (Number.isFinite(v)) qp.set('minPrice', String(Math.round(v * 100)))
+  }
+  if (typeof searchParams.maxPrice === 'string') {
+    const v = Number(searchParams.maxPrice)
+    if (Number.isFinite(v)) qp.set('maxPrice', String(Math.round(v * 100)))
+  }
   qp.set('page', '1')
   qp.set('pageSize', '20')
   try {

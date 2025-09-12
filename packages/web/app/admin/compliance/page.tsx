@@ -1,8 +1,10 @@
 "use client"
 import { useState } from 'react'
+import { useI18n } from '../../../components/i18n/provider'
 
 export default function AdminCompliancePage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const { t } = useI18n()
   const [token, setToken] = useState('')
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<any | null>(null)
@@ -29,19 +31,19 @@ export default function AdminCompliancePage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Compliance (Admin)</h1>
+      <h1 className="text-2xl font-semibold">{t('admin.compliance.title')}</h1>
       <div className="flex gap-2">
-        <input value={token} onChange={(e) => setToken(e.target.value)} type="password" placeholder="Admin Token" className="w-full border rounded p-2" />
-        <button className="btn btn-outline" onClick={loadStatus}>Status</button>
+        <input value={token} onChange={(e) => setToken(e.target.value)} type="password" placeholder={t('admin.templates.token')} className="w-full border rounded p-2" />
+        <button className="btn btn-outline" onClick={loadStatus}>{t('admin.compliance.status')}</button>
       </div>
       {status && (
         <div className="border rounded p-4 bg-white text-sm"><pre>{JSON.stringify(status, null, 2)}</pre></div>
       )}
       <div className="space-y-2">
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded p-2" placeholder="Phone (E.164)" />
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded p-2" placeholder={t('admin.compliance.phone')} />
         <div className="flex gap-2">
-          <button className="btn" onClick={doExport}>Export</button>
-          <button className="btn btn-outline" onClick={doDelete}>Request Delete (Destructive)</button>
+          <button className="btn" onClick={doExport}>{t('admin.compliance.export')}</button>
+          <button className="btn btn-outline" onClick={doDelete}>{t('admin.compliance.delete')}</button>
         </div>
       </div>
       {message && <div className="text-sm">{message}</div>}
@@ -51,4 +53,3 @@ export default function AdminCompliancePage() {
     </div>
   )
 }
-

@@ -1,10 +1,12 @@
 "use client"
 import { useState } from 'react'
+import { useI18n } from '../../../components/i18n/provider'
 
 type Msg = { type: string; text?: string }
 
 export default function WaPreviewPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const { t } = useI18n()
   const [text, setText] = useState('browse')
   const [lang, setLang] = useState<'en' | 'ar'>('en')
   const [loading, setLoading] = useState(false)
@@ -28,14 +30,14 @@ export default function WaPreviewPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">WhatsApp Preview</h1>
+      <h1 className="text-2xl font-semibold">{t('admin.waPreview.title')}</h1>
       <form onSubmit={onSend} className="flex gap-2">
-        <input value={text} onChange={(e) => setText(e.target.value)} className="w-full border rounded p-2" placeholder="Type message (e.g., 'browse', 'status <orderId>')" />
-        <select value={lang} onChange={(e) => setLang(e.target.value as any)} className="border rounded p-2">
+        <input value={text} onChange={(e) => setText(e.target.value)} className="w-full border rounded p-2" placeholder={t('admin.waPreview.placeholder')} />
+        <select value={lang} onChange={(e) => setLang(e.target.value as any)} className="border rounded p-2" aria-label={t('admin.waPreview.lang')}>
           <option value="en">EN</option>
           <option value="ar">AR</option>
         </select>
-        <button className="btn" disabled={loading}>{loading ? 'Sending…' : 'Send'}</button>
+        <button className="btn" disabled={loading}>{loading ? t('common.loading') : t('admin.waPreview.send')}</button>
       </form>
       {error && <div className="text-red-600 text-sm">{error}</div>}
       {messages && (
@@ -48,4 +50,3 @@ export default function WaPreviewPage() {
     </div>
   )
 }
-

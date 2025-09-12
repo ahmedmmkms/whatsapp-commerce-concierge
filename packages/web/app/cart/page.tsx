@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from 'react'
+import { useI18n } from '../../components/i18n/provider'
 
 type CartItem = {
   id: string
@@ -21,6 +22,7 @@ type Cart = {
 
 export default function CartPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "/api"
+  const { t } = useI18n()
   const [cart, setCart] = useState<Cart | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,16 +63,16 @@ export default function CartPage() {
     } finally { setEstimating(false) }
   }
 
-  if (loading) return <div>Loading cart…</div>
+  if (loading) return <div>{t('common.loading')}</div>
   if (error) return <div className="text-red-600">{error}</div>
-  if (!cart) return <div>No cart</div>
+  if (!cart) return <div>{t('cart.title')}</div>
 
   const currency = cart.currency || 'USD'
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Cart</h1>
+      <h1 className="text-2xl font-semibold">{t('cart.title')}</h1>
 
-      {!cart.items?.length && <div>Your cart is empty.</div>}
+      {!cart.items?.length && <div>{t('cart.empty')}</div>}
 
       {cart.items?.length ? (
         <div className="space-y-3">
@@ -84,7 +86,7 @@ export default function CartPage() {
                 <button className="btn btn-outline h-8" onClick={() => updateQty(it.id, Math.max(0, it.qty - 1))}>-</button>
                 <span className="w-8 text-center">{it.qty}</span>
                 <button className="btn btn-outline h-8" onClick={() => updateQty(it.id, it.qty + 1)}>+</button>
-                <button className="btn btn-outline h-8" onClick={() => removeItem(it.id)}>Remove</button>
+                <button className="btn btn-outline h-8" onClick={() => removeItem(it.id)}>{t('cart.remove')}</button>
               </div>
             </div>
           ))}
@@ -92,14 +94,14 @@ export default function CartPage() {
       ) : null}
 
       <div className="border rounded p-4 bg-white">
-        <div>Subtotal: {(cart.subtotalMinor || 0) / 100} {currency}</div>
-        <div>Shipping: {(cart.shippingMinor || 0) / 100} {currency}</div>
-        <div>Total: <strong>{(cart.totalMinor || 0) / 100} {currency}</strong></div>
+        <div>{t('cart.subtotal')}: {(cart.subtotalMinor || 0) / 100} {currency}</div>
+        <div>{t('cart.shipping')}: {(cart.shippingMinor || 0) / 100} {currency}</div>
+        <div>{t('cart.total')}: <strong>{(cart.totalMinor || 0) / 100} {currency}</strong></div>
       </div>
 
       <div className="flex gap-3">
-        <button className="btn" onClick={getEstimate} disabled={estimating}>{estimating ? 'Estimating…' : 'Estimate Shipping'}</button>
-        <a className="btn btn-outline" href="/checkout">Go to Checkout</a>
+        <button className="btn" onClick={getEstimate} disabled={estimating}>{estimating ? t('common.loading') : t('cart.estimate')}</button>
+        <a className="btn btn-outline" href="/checkout">{t('cart.checkout')}</a>
       </div>
 
       {estimate && (

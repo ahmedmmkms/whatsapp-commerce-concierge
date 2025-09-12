@@ -39,9 +39,9 @@ export function Header() {
         <nav className="text-sm text-muted-foreground flex items-center gap-4">
           <Link className="hover:text-foreground" href="/">{t('nav.home')}</Link>
           <Link className="hover:text-foreground" href="/products">{t('nav.products')}</Link>
-          <Link className="hover:text-foreground" href="/support/order-lookup">Support</Link>
+          <Link className="hover:text-foreground" href="/support/order-lookup">{t('nav.support')}</Link>
           <MiniCart />
-          <Link className="hover:text-foreground" href="/orders">Orders</Link>
+          <Link className="hover:text-foreground" href="/orders">{t('nav.orders')}</Link>
           <LangToggle />
         </nav>
       </div>

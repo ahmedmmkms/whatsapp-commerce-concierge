@@ -1,8 +1,10 @@
 "use client"
 import { useState } from 'react'
+import { useI18n } from '../../../components/i18n/provider'
 
 export default function StartReturnPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const { t } = useI18n()
   const [orderId, setOrderId] = useState('')
   const [reason, setReason] = useState('')
   const [notes, setNotes] = useState('')
@@ -27,12 +29,12 @@ export default function StartReturnPage() {
 
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Start a Return</h1>
+      <h1 className="text-2xl font-semibold">{t('returns.start.title')}</h1>
       <form onSubmit={onSubmit} className="space-y-3">
-        <input className="w-full border rounded p-2" placeholder="Order ID" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
-        <input className="w-full border rounded p-2" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
-        <textarea className="w-full border rounded p-2" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
-        <button className="btn" disabled={loading}>{loading ? 'Submitting…' : 'Submit'}</button>
+        <input className="w-full border rounded p-2" placeholder={t('returns.start.orderId')} value={orderId} onChange={(e) => setOrderId(e.target.value)} />
+        <input className="w-full border rounded p-2" placeholder={t('returns.start.reason')} value={reason} onChange={(e) => setReason(e.target.value)} />
+        <textarea className="w-full border rounded p-2" placeholder={t('returns.start.notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <button className="btn" disabled={loading}>{loading ? t('common.loading') : t('returns.start.submit')}</button>
       </form>
       {error && <div className="text-red-600 text-sm">{error}</div>}
       {result && (
@@ -45,4 +47,3 @@ export default function StartReturnPage() {
     </div>
   )
 }
-
