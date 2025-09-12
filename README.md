@@ -269,7 +269,9 @@ Migrations live in `packages/api/prisma/migrations`, applied via Prisma.
 
 ## License
 
-This project is licensed under the terms of the repository’s LICENSE. See [LICENSE](LICENSE).
+Code in this repository is licensed under Apache-2.0 — see [LICENSE](LICENSE).
+
+Disclaimer: This repository is provided as a source‑available showcase for portfolio and evaluation purposes; it is not a production product. Third‑party brand names, images, and logos remain the property of their respective owners and are excluded from the licensing grant. Review and harden before any production use.
 
 ## About the Author / Work With Me
 
