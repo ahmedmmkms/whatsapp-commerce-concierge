@@ -12,14 +12,18 @@ async function getApiBase() {
 async function getProducts(searchParams: { [key: string]: string | string[] | undefined }) {
   const base = await getApiBase()
   const qp = new URLSearchParams()
-  if (typeof searchParams.q === 'string') qp.set('q', searchParams.q)
-  if (typeof searchParams.category === 'string') qp.set('category', searchParams.category)
-  if (typeof searchParams.minPrice === 'string') {
-    const v = Number(searchParams.minPrice)
+  const qRaw = typeof searchParams.q === 'string' ? searchParams.q.trim() : ''
+  const catRaw = typeof searchParams.category === 'string' ? searchParams.category.trim() : ''
+  const minRaw = typeof searchParams.minPrice === 'string' ? searchParams.minPrice.trim() : ''
+  const maxRaw = typeof searchParams.maxPrice === 'string' ? searchParams.maxPrice.trim() : ''
+  if (qRaw) qp.set('q', qRaw)
+  if (catRaw) qp.set('category', catRaw)
+  if (minRaw) {
+    const v = Number(minRaw)
     if (Number.isFinite(v)) qp.set('minPrice', String(Math.round(v * 100)))
   }
-  if (typeof searchParams.maxPrice === 'string') {
-    const v = Number(searchParams.maxPrice)
+  if (maxRaw) {
+    const v = Number(maxRaw)
     if (Number.isFinite(v)) qp.set('maxPrice', String(Math.round(v * 100)))
   }
   qp.set('page', '1')
