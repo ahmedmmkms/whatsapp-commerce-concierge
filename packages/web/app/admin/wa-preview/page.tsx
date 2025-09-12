@@ -44,22 +44,24 @@ export default function WaPreviewPage() {
         </div>
       )}
       {(!guardToken || unlocked) && (
-      <form onSubmit={onSend} className="flex gap-2">
-        <input value={text} onChange={(e) => setText(e.target.value)} className="w-full border rounded p-2" placeholder={t('admin.waPreview.placeholder')} />
-        <select value={lang} onChange={(e) => setLang(e.target.value as any)} className="border rounded p-2" aria-label={t('admin.waPreview.lang')}>
-          <option value="en">EN</option>
-          <option value="ar">AR</option>
-        </select>
-        <button className="btn" disabled={loading}>{loading ? t('common.loading') : t('admin.waPreview.send')}</button>
-      </form>
-      {error && <div className="text-red-600 text-sm">{error}</div>}
-      {messages && (
-        <div className="border rounded p-4 bg-white text-sm space-y-2">
-          {messages.map((m, i) => (
-            <div key={i} className="border rounded p-2"><pre className="whitespace-pre-wrap">{JSON.stringify(m, null, 2)}</pre></div>
-          ))}
-        </div>
-      )}
+        <>
+          <form onSubmit={onSend} className="flex gap-2">
+            <input value={text} onChange={(e) => setText(e.target.value)} className="w-full border rounded p-2" placeholder={t('admin.waPreview.placeholder')} />
+            <select value={lang} onChange={(e) => setLang(e.target.value as any)} className="border rounded p-2" aria-label={t('admin.waPreview.lang')}>
+              <option value="en">EN</option>
+              <option value="ar">AR</option>
+            </select>
+            <button className="btn" disabled={loading}>{loading ? t('common.loading') : t('admin.waPreview.send')}</button>
+          </form>
+          {error && <div className="text-red-600 text-sm">{error}</div>}
+          {messages && (
+            <div className="border rounded p-4 bg-white text-sm space-y-2">
+              {messages.map((m, i) => (
+                <div key={i} className="border rounded p-2"><pre className="whitespace-pre-wrap">{JSON.stringify(m, null, 2)}</pre></div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
