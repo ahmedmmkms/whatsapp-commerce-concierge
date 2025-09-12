@@ -23,18 +23,23 @@ body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, N
   @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none h-9 px-4 py-2;
 }
 .btn-primary {
-  @apply bg-primary text-primary-foreground hover:opacity-90;
+  @apply bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-95 shadow-sm hover:shadow focus-visible:ring-offset-2 active:opacity-95;
 }
 .btn-outline {
   @apply border border-border bg-transparent text-foreground hover:bg-muted;
 }
 
 .card {
-  @apply bg-card text-card-foreground rounded-lg border border-border shadow-card;
+  @apply bg-card text-card-foreground rounded-lg border border-border shadow-card transition-transform duration-150 ease-out;
 }
 .card-body { @apply p-4; }
 .card-title { @apply text-lg font-semibold; }
 .card-subtitle { @apply text-sm text-muted-foreground; }
+
+.card:hover { @apply -translate-y-0.5 shadow; }
+
+/* Header brand accent bar */
+.brand-accent-bar { @apply absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primary to-accent; }
 
 .badge {
   @apply inline-flex items-center rounded-md border border-transparent bg-muted text-muted-foreground px-2 py-0.5 text-xs font-medium;

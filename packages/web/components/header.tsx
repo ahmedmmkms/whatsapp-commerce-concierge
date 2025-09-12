@@ -33,7 +33,7 @@ function CartLink() {
 export function Header() {
   const { t } = useI18n()
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <header className="relative border-b border-border bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="container-page flex h-14 items-center justify-between">
         <Link href="/" className="font-semibold tracking-tight">WhatsApp Concierge</Link>
         <nav className="text-sm text-muted-foreground flex items-center gap-4">
@@ -45,6 +45,7 @@ export function Header() {
           <LangToggle />
         </nav>
       </div>
+      <div className="brand-accent-bar" />
     </header>
   )
 }

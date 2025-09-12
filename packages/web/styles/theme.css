@@ -1,55 +1,55 @@
 :root {
-  /* Light theme: elegant neutrals + teal accent suitable for AR/EN */
+  /* Light theme: modern electronics brand — electric blue + cyan gradient, clean neutrals */
   --background: 0 0% 100%;
-  --foreground: 222.2 47.4% 11.2%;
+  --foreground: 222 47% 11%;
 
   --card: 0 0% 100%;
-  --card-foreground: 222.2 47.4% 11.2%;
+  --card-foreground: 222 47% 11%;
 
-  --muted: 210 20% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 16% 47%;
 
-  --primary: 180 66% 35%; /* teal */
-  --primary-foreground: 180 100% 96%;
+  /* Brand colors */
+  --primary: 224 76% 52%; /* electric blue */
+  --primary-foreground: 210 40% 98%;
 
-  --secondary: 28 60% 94%; /* sand */
-  --secondary-foreground: 25 30% 25%;
+  --secondary: 220 14% 96%; /* light slate */
+  --secondary-foreground: 222 47% 16%;
 
-  --accent: 195 82% 40%; /* turquoise */
-  --accent-foreground: 195 100% 97%;
+  --accent: 199 89% 48%; /* vivid cyan */
+  --accent-foreground: 210 40% 98%;
 
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 180 66% 35%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 224 76% 52%;
 
-  --radius: 10px;
+  --radius: 12px;
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
+  --background: 222 84% 5%;
   --foreground: 210 40% 98%;
 
-  --card: 222.2 84% 5.5%;
+  --card: 222 84% 6%;
   --card-foreground: 210 40% 98%;
 
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 217 33% 18%;
+  --muted-foreground: 215 20% 65%;
 
-  --primary: 180 66% 38%;
-  --primary-foreground: 180 100% 96%;
+  --primary: 224 76% 58%;
+  --primary-foreground: 210 40% 98%;
 
-  --secondary: 28 30% 20%;
-  --secondary-foreground: 28 30% 92%;
+  --secondary: 220 14% 16%;
+  --secondary-foreground: 220 14% 92%;
 
-  --accent: 195 82% 43%;
-  --accent-foreground: 195 100% 97%;
+  --accent: 199 89% 54%;
+  --accent-foreground: 210 40% 98%;
 
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 180 66% 38%;
+  --border: 217 33% 18%;
+  --input: 217 33% 18%;
+  --ring: 224 76% 58%;
 }
 
 /* RTL helpers */
 html[dir="rtl"] .rtl-hidden { display: none !important; }
 html[dir="ltr"] .ltr-hidden { display: none !important; }
-
