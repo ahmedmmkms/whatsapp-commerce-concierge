@@ -8,10 +8,10 @@ Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience 
 [![NestJS](https://img.shields.io/badge/NestJS-10-E0234E)](https://nestjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)](https://prisma.io)
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)](https://vercel.com)
-[![License](https://img.shields.io/github/license/<owner>/<repo>)](LICENSE)
+[![License](https://img.shields.io/github/license/ahmedmmkms/whatsapp-commerce-concierge)](LICENSE)
 
-- Live Demo: <https://…> (optional)
-- API (Swagger): <https://…/docs> (optional)
+ - Live Demo (Web): <https://whatsapp-commerce-concierge-web.vercel.app>
+ - API (Swagger): <https://whatsapp-commerce-concierge-api.vercel.app/docs>
 - Hero screenshot: add `docs/hero.png` or `public/og.png` to showcase the app
 
 ## Table of Contents
@@ -290,3 +290,4 @@ Services:
 Notes
 - Replace placeholders (OWNER/REPO, ProjectName, Live Demo URL, contact links) before publishing.
 - Add a `docs/hero.png` or real screenshots to make the README visually pop.
+

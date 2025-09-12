@@ -48,7 +48,18 @@ export async function createApp() {
     .setVersion('0.1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    customCssUrl: 'https://unpkg.com/swagger-ui-dist@5/swagger-ui.css',
+    customJs: [
+      'https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js',
+      'https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js',
+    ],
+    customSiteTitle: 'WhatsApp Commerce Concierge API Docs',
+    swaggerOptions: {
+      docExpansion: 'list',
+      persistAuthorization: true,
+    },
+  });
   // For serverless usage, initialize the app without listening on a port
   await app.init();
   return app;
