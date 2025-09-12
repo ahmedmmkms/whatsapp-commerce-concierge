@@ -84,16 +84,16 @@ Monorepo with clear separation of concerns:
 The backend follows a layered approach (controllers, services, modules) with Prisma for data, Redis for caching/idempotency, and integrations (WhatsApp/Stripe). The web uses server components where appropriate and client components for interactions.
 
 ```mermaid
-flowchart LR
-  U[User (Web/WhatsApp)] --> W[Next.js (Web)]
-  U --> H[WhatsApp Webhook]
-  W --> A[NestJS API]
+graph LR
+  U["User (Web/WhatsApp)"] --> W["Next.js Web"]
+  U --> H["WhatsApp Webhook"]
+  W --> A["NestJS API"]
   H --> A
-  A --> S[Services (Orders/Returns/Cart/Catalog/Checkout/CMS)]
-  S --> P[(PostgreSQL via Prisma)]
-  S --> R[(Redis Cache/Queues)]
-  S --> ST[Stripe]
-  S --> WA[WhatsApp Cloud]
+  A --> S["Services: Orders / Returns / Cart / Catalog / Checkout / CMS"]
+  S --> P[("PostgreSQL · Prisma")]
+  S --> R[("Redis · Cache/Queues")]
+  S --> Stripe["Stripe"]
+  S --> WACloud["WhatsApp Cloud"]
 ```
 
 ## Directory Structure
@@ -254,20 +254,11 @@ Migrations live in `packages/api/prisma/migrations`, applied via Prisma.
 - Vercel: serverless API using `@vendia/serverless-express`, Web app via Next.js.
 - Infra docs: Neon (Postgres) config guide; Upstash (Redis) notes; Dockerfiles for local.
 
-## Roadmap
-
-- [ ] Expand translations (AR/EN complete; FR/JA scaffolding)
-- [ ] Brand search filters (brand=) on API + UI
-- [ ] Promotions: best-sellers/new arrivals sorting on API
-- [ ] More analytics wiring beyond dataLayer (e.g., GA4 endpoint or Snowplow)
-- [ ] Additional payment adapters (Tamara/Tabby/Mada) behind gateway
-- [ ] Inventory/webhooks + recommendations
-
 ## License
 
 This project is licensed under the terms of the repository’s LICENSE. See [LICENSE](LICENSE).
 
-## About the Author / Work With Me
+## About the Author 
 
 - I deliver production‑grade commerce experiences — fast, bilingual, and reliable.
 - Architecture that holds: modular monorepo, service boundaries, and serverless‑ready APIs.
@@ -276,9 +267,8 @@ This project is licensed under the terms of the repository’s LICENSE. See [LIC
 - Customer‑centric UX: accessibility and Arabic‑first details you don’t have to ask for.
 
 Contact / Hire Me:
-- LinkedIn: …
-- Email: …
-- Website: …
+ - [ ![LinkedIn](https://img.shields.io/badge/LinkedIn-ahmedmmkms-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ahmedmmkms/) 
+
 
 Services:
 - Product engineering, architecture, cloud/DevOps, developer experience, performance, accessibility, i18n.
