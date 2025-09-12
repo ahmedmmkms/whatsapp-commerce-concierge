@@ -14,6 +14,70 @@ Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience 
  - API (Swagger): <https://whatsapp-commerce-concierge-api.vercel.app/docs>
 - Hero screenshot: add `docs/hero.png` or `public/og.png` to showcase the app
 
+## Screenshots
+
+Below are representative desktop and mobile screenshots. Images are included under `site_screens/` for quick review and portfolio use.
+
+<table>
+  <tr>
+    <th align="left">Home (Desktop)</th>
+    <th align="left">Home (Mobile)</th>
+  </tr>
+  <tr>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app__desktop.png" alt="Home desktop" width="720" />
+    </td>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app__mobile.png" alt="Home mobile" width="320" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th align="left">Products (Desktop)</th>
+    <th align="left">Products (Mobile)</th>
+  </tr>
+  <tr>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_products__desktop.png" alt="Products desktop" width="720" />
+    </td>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_products__mobile.png" alt="Products mobile" width="320" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th align="left">Product Detail (Desktop)</th>
+    <th align="left">Product Detail (Mobile)</th>
+  </tr>
+  <tr>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_products_d80decea-0ad2-4c43-8892-8ec1509e0335__desktop.png" alt="Product detail desktop" width="720" />
+    </td>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_products_d80decea-0ad2-4c43-8892-8ec1509e0335__mobile.png" alt="Product detail mobile" width="320" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th align="left">Cart (Desktop)</th>
+    <th align="left">Cart (Mobile)</th>
+  </tr>
+  <tr>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_cart__desktop.png" alt="Cart desktop" width="720" />
+    </td>
+    <td>
+      <img src="site_screens/whatsapp-commerce-concierge-web.vercel.app_cart__mobile.png" alt="Cart mobile" width="320" />
+    </td>
+  </tr>
+</table>
+
 ## Table of Contents
 
 - Why This Matters
@@ -266,7 +330,7 @@ This project is licensed under the terms of the repository’s LICENSE. See [LIC
 - Great DX: clean code, documentation, scripted acceptance, and smooth handoffs.
 - Customer‑centric UX: accessibility and Arabic‑first details you don’t have to ask for.
 
-Contact / Hire Me:
+Contact:
  - [ ![LinkedIn](https://img.shields.io/badge/LinkedIn-ahmedmmkms-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ahmedmmkms/) 
 
 
@@ -274,8 +338,4 @@ Services:
 - Product engineering, architecture, cloud/DevOps, developer experience, performance, accessibility, i18n.
 
 ---
-
-Notes
-- Replace placeholders (OWNER/REPO, ProjectName, Live Demo URL, contact links) before publishing.
-- Add a `docs/hero.png` or real screenshots to make the README visually pop.
 
