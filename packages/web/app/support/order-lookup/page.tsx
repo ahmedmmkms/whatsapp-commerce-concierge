@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useI18n } from "../../../components/i18n/provider";
+import { track } from "../../../components/analytics";
 
 type OrderSummary = { id: string; createdAt: string; status: string; totalMinor: number; currency: string };
 
@@ -27,10 +28,12 @@ export default function OrderLookupPage() {
         const r = await fetch(`${apiBase}/orders/${encodeURIComponent(orderId)}`);
         setRequestId(r.headers.get('x-request-id'));
         payload = await r.json();
+        track('support_lookup', { mode: 'by_id', ok: r.ok, orderId, requestId: r.headers.get('x-request-id') || undefined });
       } else if (phone) {
         const r = await fetch(`${apiBase}/orders?phone=${encodeURIComponent(phone)}`);
         setRequestId(r.headers.get('x-request-id'));
         payload = await r.json();
+        track('support_lookup', { mode: 'by_phone', ok: r.ok, phone, requestId: r.headers.get('x-request-id') || undefined });
       } else {
         setError("Provide order ID or phone (E.164)");
         setLoading(false);
@@ -39,6 +42,7 @@ export default function OrderLookupPage() {
       setResult(payload);
     } catch (err: any) {
       setError(err?.message ?? "Lookup failed");
+      track('support_lookup', { ok: false, error: err?.message || String(err) });
     } finally {
       setLoading(false);
     }

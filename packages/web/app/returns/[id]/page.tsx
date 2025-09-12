@@ -21,7 +21,7 @@ export default async function ReturnDetailPage({ params }: { params: { id: strin
   const ret = data.return
   return (
     <div className="max-w-xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Return {ret.id}</h1>
+      <h1 className="text-2xl font-semibold"><I18nText k="returns.detail.title" /> {ret.id}</h1>
       <div className="border rounded p-4 bg-white space-y-1">
         <div>Order: {ret.orderId}</div>
         <div>Status: {ret.status}</div>
@@ -38,3 +38,4 @@ export default async function ReturnDetailPage({ params }: { params: { id: strin
     </div>
   )
 }
+import { I18nText } from '../../../components/i18n/text'
