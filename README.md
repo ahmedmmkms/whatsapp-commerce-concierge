@@ -1,14 +1,294 @@
-# WhatsApp Commerce Concierge (P1)
+# <ProjectName> — Electronics Commerce on WhatsApp + Web, Built for Speed and Scale
 
-Author: AMM
+Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience that blends WhatsApp conversational flows with a high‑performing web storefront — designed with performance, a11y, i18n, and operational excellence from day one.
 
-Sprint 0 scaffolding for a WhatsApp-first conversational commerce MVP.
+[![CI](https://img.shields.io/github/actions/workflow/status/<owner>/<repo>/ci.yml?branch=main)](https://github.com/<owner>/<repo>/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-10-E0234E)](https://nestjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)](https://prisma.io)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)](https://vercel.com)
+[![License](https://img.shields.io/github/license/<owner>/<repo>)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/<owner>/<repo>)](https://github.com/<owner>/<repo>/commits/main)
+[![Issues](https://img.shields.io/github/issues/<owner>/<repo>)](https://github.com/<owner>/<repo>/issues)
 
-Key components:
-- packages/api: NestJS API (WhatsApp + Stripe webhooks, health, OpenAPI)
-- packages/web: Next.js 14 web (shadcn/ui, Tailwind, RTL)
-- infra: Docker Compose for local (Postgres, Redis, API, Web)
-- .github/workflows: CI (lint/test/build) and deploy hooks
+- Live Demo: <https://…> (optional)
+- API (Swagger): <https://…/docs> (optional)
+- Hero screenshot: add `docs/hero.png` or `public/og.png` to showcase the app
 
-See docs/sprint-0-runbook.md for setup and deployment.
+## Table of Contents
 
+- Why This Matters
+- Feature Highlights
+- Tech Stack at a Glance
+- Architecture Overview
+- Directory Structure
+- Requirements & Prerequisites
+- Quickstart (TL;DR)
+- Configuration & Scripts
+- API / Routes
+- Data Model
+- Quality, Testing & Coverage
+- Performance & DX
+- Security & Privacy
+- Accessibility & i18n
+- CI/CD & Deployment
+- Roadmap
+- License
+- About the Author / Work With Me
+
+---
+
+## Why This Matters (for clients) ✨
+
+- Conversational commerce with WhatsApp + Web to accelerate conversion.
+- WCAG‑friendly, bilingual (AR/EN) UX with RTL support — built for MENA audiences.
+- Production‑ready APIs with idempotency, rate limits, and observability baked in.
+- PDPL‑aware data export/delete flows and audit trails.
+- Cloud‑native deployment (Vercel/Neon/Upstash) with CI/CD and infra scripts.
+- Fast by default: caching, SSR, API budgets, and perf/load testing hooks.
+
+## Feature Highlights
+
+- 🟢 WhatsApp Cloud API webhook: signature verification, intents (browse, cart, status, returns, agent), operator preview UI.
+- 🛒 Web storefront: products, filters, detail pages, cart, checkout (COD/Stripe), orders/returns lookup for support.
+- 🧱 CMS-lite for WhatsApp templates (AR/EN) with admin token guard.
+- 📦 Orders & Returns APIs (Prisma), RMA, eligibility rules, audit events.
+- 🔐 Compliance (PDPL) endpoints for export/delete with `ComplianceAudit`.
+- 📈 Analytics hooks (dataLayer) + acceptance scripts across sprints.
+- 🌍 i18n with RTL toggle; Arabic-first visuals; accessible components.
+- 🧰 DevEx & Ops: Swagger, health/metrics, Redis cache, BullMQ skeleton, serverless adapter for Vercel, Docker compose for local DB/Redis.
+
+## Tech Stack at a Glance
+
+| Area | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router), React, TypeScript, TailwindCSS |
+| Backend | NestJS, TypeScript, Express (serverless-adapted) |
+| Data/ORM | Prisma, PostgreSQL (Neon recommended) |
+| Messaging/Queues | BullMQ + Redis (Upstash recommended) |
+| Payments | Stripe (test) + COD (abstraction in Checkout service) |
+| Caching | Redis wrapper with TTLs and idempotency keys |
+| Testing | Jest (unit), acceptance scripts (PowerShell), load (k6/Artillery placeholders) |
+| Infra/Deploy | Vercel (API/Web), Dockerfiles, docker-compose for local |
+| CI/CD | GitHub Actions (build/test), Prisma DB deploy, PR hygiene checks |
+| Observability | Sentry placeholders, request/trace logging, metrics endpoint |
+| i18n & RTL | Custom provider (AR/EN core; FR/JA scaffolding ready) |
+| Security | CORS, rate limiting, admin token guard, HMAC webhook signatures |
+
+## Architecture Overview
+
+Monorepo with clear separation of concerns:
+
+- `packages/web`: Next.js app (App Router) — UI, SSR fetchers, i18n/RTL, design system.
+- `packages/api`: NestJS services — controllers → services → Prisma repos; serverless adapter for Vercel.
+
+The backend follows a layered approach (controllers, services, modules) with Prisma for data, Redis for caching/idempotency, and integrations (WhatsApp/Stripe). The web uses server components where appropriate and client components for interactions.
+
+```mermaid
+flowchart LR
+  U[User (Web/WhatsApp)] -->|Web| W[Next.js (Web)]
+  U -->|WA| H[WhatsApp Webhook]
+  W -->|REST| A[NestJS API]
+  H --> A
+  A --> S[Services (Orders/Returns/Cart/Catalog/Checkout/CMS)]
+  S --> P[(PostgreSQL via Prisma)]
+  S --> R[(Redis Cache/Queues)]
+  S --> ST[Stripe]:::ext
+  S --> WA[WhatsApp Cloud]:::ext
+
+  classDef ext fill:#fff,stroke:#999,stroke-dasharray: 3 3
+```
+
+## Directory Structure
+
+```
+packages/
+  web/                    # Next.js 14 web app (App Router)
+    app/                  # Pages and routes
+    components/           # UI + landing sections, i18n, theme
+    styles/               # Tailwind CSS + theme variables
+    next.config.js        # Rewrites /api → API URL
+  api/                    # NestJS API (serverless)
+    src/                  # Modules: catalog, cart, checkout, orders, returns, cms, compliance, whatsapp, health
+    prisma/               # Schema + migrations
+    api/[[...slug]].ts    # Vercel serverless adapter
+  ...
+scripts/                  # Acceptance & smoke scripts per sprint
+docs/                     # Backlog, sprint notes, playbooks
+infra/                    # Docker compose and DB seeds
+```
+
+## Requirements & Prerequisites
+
+- Node.js 18+ (recommended LTS)
+- pnpm (via Corepack): `corepack enable`
+- PostgreSQL (Neon recommended) and Redis (Upstash recommended) for prod
+- Vercel accounts (separate projects for API and Web)
+
+### .env.example (sanitized)
+
+API (packages/api):
+- DATABASE_URL=postgres://user:pass@host:5432/db
+- REDIS_URL=rediss://:pass@host:6379
+- CORS_ORIGINS=http://localhost:3000,https://your-web.vercel.app
+- ADMIN_TOKEN=change-me
+- RETURNS_ELIGIBLE_DAYS=30
+- STRIPE_SECRET_KEY=sk_test_...
+- CHECKOUT_SUCCESS_URL=https://your-web.vercel.app/orders/{ORDER_ID}
+- CHECKOUT_CANCEL_URL=https://your-web.vercel.app/checkout?cancel=1
+- SENTRY_DSN=
+- WA_VERIFY_TOKEN=change-me (if needed)
+- WA_APP_SECRET=change-me (for HMAC verification)
+
+Web (packages/web):
+- NEXT_PUBLIC_API_URL=https://your-api.vercel.app
+- NEXT_PUBLIC_API_BASE_URL=https://your-api.vercel.app
+- NEXT_PUBLIC_WA_NUMBER=9715XXXXXXXX
+- NEXT_PUBLIC_RTL=0
+- NEXT_PUBLIC_ADMIN_PREVIEW_TOKEN=optional
+
+## Quickstart (TL;DR)
+
+Install
+- corepack enable
+- pnpm install
+
+Dev (split terminals)
+- API: cd packages/api && pnpm dev
+- Web: cd packages/web && pnpm dev
+
+Build all
+- pnpm -r --parallel build
+
+Run tests (where available)
+- pnpm -r test
+
+Local DB/Redis (optional)
+- docker compose -f infra/docker-compose.yml up -d
+
+Seed data
+- cd packages/api && node scripts/seed-electronics.mjs
+
+## Configuration & Scripts
+
+Notable scripts (check each package.json for the full list):
+- Root: `pnpm -r --parallel build`
+- API:
+  - `pnpm dev` — local NestJS server
+  - `pnpm build` — tsc compile
+  - `pnpm prisma migrate deploy` — run migrations
+  - `node scripts/seed-electronics.mjs` — demo products
+  - `node scripts/seed-templates.mjs` — WhatsApp templates
+- Web:
+  - `pnpm dev` — Next.js dev server
+  - `pnpm build` — production build
+- Acceptance:
+  - `pwsh scripts/acceptance-all.ps1 -ApiBase <API_URL>`
+  - Sprint 8: `pwsh scripts/sprint8-acceptance.ps1 -ApiBase <API_URL> -WebBase <WEB_URL>`
+
+## API / Routes
+
+Public
+- GET /healthz — liveness
+- GET /products, GET /products/:id — catalog
+- GET /categories — categories
+- POST /cart/items, PATCH/DELETE /cart/items/:id, GET /cart — cart ops
+- POST /checkout/init — create order (COD/Stripe)
+- GET /orders/:id — order detail
+- GET /orders?phone=E164 — redacted orders list by phone
+- POST /returns — start a return; GET /returns/:id; GET /returns?orderId=…
+- GET /whatsapp/preview — operator preview (text/lang)
+
+Admin (x-admin-token)
+- GET/POST/PUT/DELETE /cms/templates — WhatsApp templates CRUD
+- GET /compliance/pdpl/status — PDPL capabilities
+- POST /compliance/pdpl/export — PDPL export (inline JSON)
+- POST /compliance/pdpl/delete — schedule redaction
+
+WhatsApp Webhook
+- GET/POST /webhook/whatsapp — verify + ingest (HMAC signature)
+
+Docs
+- Swagger at /docs (API project)
+
+## Data Model (Prisma overview)
+
+Highlights (not exhaustive):
+- Catalog: Category, Product, ProductMedia
+- Customers & Conversations: Customer, Conversation, Consent
+- Cart & Orders: Cart, CartItem, Order, OrderItem, Payment, Address
+- Returns: Return, ReturnItem
+- CMS: Template (key/locale/channel/body/variables/isActive)
+- Compliance: ComplianceAudit (action, status, subject, timestamps)
+
+Migrations live in `packages/api/prisma/migrations`, applied via Prisma.
+
+## Quality, Testing & Coverage
+
+- Unit tests (Jest) around utilities (e.g., webhook signature).
+- Acceptance scripts per sprint under `/scripts` (PowerShell).
+- Load testing profiles (k6/Artillery) as placeholders.
+- GitHub Actions run builds/tests and (optionally) DB deploy workflows.
+
+## Performance & DX
+
+- SSR (Next.js), minimal client JS for landing; lazy images below the fold.
+- Redis caching with TTLs for products/categories; idempotency keys for cart ops.
+- P95 budgets and acceptance hooks (Sprint 7).
+- DeveloperLog and docs to capture decisions and keep handoffs smooth.
+
+## Security & Privacy
+
+- CORS allowlist; rate limiting via Nest’s Throttler.
+- HMAC verification for WhatsApp signatures with rawBody preservation.
+- Admin guards via `x-admin-token`.
+- PDPL export/delete flows with auditing.
+
+## Accessibility & i18n
+
+- i18n provider (AR/EN), RTL toggle; Arabic-first content patterns.
+- Keyboard navigable UI with visible focus states.
+- Operator pages (WA preview, templates) keep semantics + aria labels.
+- Optional Axe scans; can be re-enabled in acceptance as needed.
+
+## CI/CD & Deployment
+
+- GitHub Actions: CI (build/test), Prisma DB deploy, PR hygiene checks.
+- Vercel: serverless API using `@vendia/serverless-express`, Web app via Next.js.
+- Infra docs: Neon (Postgres) config guide; Upstash (Redis) notes; Dockerfiles for local.
+
+## Roadmap
+
+- [ ] Expand translations (AR/EN complete; FR/JA scaffolding)
+- [ ] Brand search filters (brand=) on API + UI
+- [ ] Promotions: best-sellers/new arrivals sorting on API
+- [ ] More analytics wiring beyond dataLayer (e.g., GA4 endpoint or Snowplow)
+- [ ] Additional payment adapters (Tamara/Tabby/Mada) behind gateway
+- [ ] Inventory/webhooks + recommendations
+
+## License
+
+This project is licensed under the terms of the repository’s LICENSE. See [LICENSE](LICENSE).
+
+## About the Author / Work With Me
+
+- I deliver production‑grade commerce experiences — fast, bilingual, and reliable.
+- Architecture that holds: modular monorepo, service boundaries, and serverless‑ready APIs.
+- Ops you can trust: CI/CD, migrations, observability, performance/load testing hooks.
+- Great DX: clean code, documentation, scripted acceptance, and smooth handoffs.
+- Customer‑centric UX: accessibility and Arabic‑first details you don’t have to ask for.
+
+Contact / Hire Me:
+- LinkedIn: …
+- Email: …
+- Website: …
+
+Services:
+- Product engineering, architecture, cloud/DevOps, developer experience, performance, accessibility, i18n.
+
+---
+
+Notes
+- Replace placeholders (OWNER/REPO, ProjectName, Live Demo URL, contact links) before publishing.
+- Add a `docs/hero.png` or real screenshots to make the README visually pop.
