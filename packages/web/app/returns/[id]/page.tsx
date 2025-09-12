@@ -2,7 +2,7 @@ async function getApiBase() {
   return (
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
-    'http://localhost:3001'
+    '/api'
   )
 }
 
@@ -38,4 +38,3 @@ export default async function ReturnDetailPage({ params }: { params: { id: strin
     </div>
   )
 }
-

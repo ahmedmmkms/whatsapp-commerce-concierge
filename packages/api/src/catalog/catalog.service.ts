@@ -35,6 +35,7 @@ export class CatalogService {
         { name: { contains: q, mode: 'insensitive' } },
         { description: { contains: q, mode: 'insensitive' } },
         { sku: { contains: q, mode: 'insensitive' } },
+        { brand: { contains: q, mode: 'insensitive' } },
       ];
     }
     if (params.minPrice != null || params.maxPrice != null) {
