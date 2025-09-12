@@ -40,13 +40,13 @@ export default function AdminTemplatesPage() {
       </div>
       {error && <div className="text-red-600 text-sm">{error}</div>}
       <div className="space-y-4">
-        {templates.map((t) => (
-          <div key={t.id} className="border rounded p-4 bg-white">
-            <div className="font-medium">{t.key} / {t.locale} / {t.channel}</div>
-            <textarea className="w-full border rounded p-2 mt-2 min-h-[100px]" value={t.body} onChange={(e) => setTemplates(prev => prev.map(x => x.id === t.id ? { ...x, body: e.target.value } : x))} />
+        {templates.map((tpl) => (
+          <div key={tpl.id} className="border rounded p-4 bg-white">
+            <div className="font-medium">{tpl.key} / {tpl.locale} / {tpl.channel}</div>
+            <textarea className="w-full border rounded p-2 mt-2 min-h-[100px]" value={tpl.body} onChange={(e) => setTemplates(prev => prev.map(x => x.id === tpl.id ? { ...x, body: e.target.value } : x))} />
             <div className="mt-2 flex gap-2">
-              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={t.isActive} onChange={(e) => setTemplates(prev => prev.map(x => x.id === t.id ? { ...x, isActive: e.target.checked } : x))} /> {t('admin.templates.active')}</label>
-              <button className="btn btn-sm" onClick={() => save(t)}>{t('admin.templates.save')}</button>
+              <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={tpl.isActive} onChange={(e) => setTemplates(prev => prev.map(x => x.id === tpl.id ? { ...x, isActive: e.target.checked } : x))} /> {t('admin.templates.active')}</label>
+              <button className="btn btn-sm" onClick={() => save(tpl)}>{t('admin.templates.save')}</button>
             </div>
           </div>
         ))}
