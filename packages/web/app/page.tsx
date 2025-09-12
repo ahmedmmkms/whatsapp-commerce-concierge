@@ -1,12 +1,19 @@
-import { HomeHero } from '../components/home-hero'
-import { HomeFeatures } from '../components/home-features'
+import { Hero } from '../components/landing/Hero'
+import { CategoryGrid } from '../components/landing/CategoryGrid'
+import { DealsSection } from '../components/landing/Deals'
+import { Brands } from '../components/landing/Brands'
+import { Testimonials } from '../components/landing/Testimonials'
+import { Newsletter } from '../components/landing/Newsletter'
 
 export default function HomePage() {
   return (
     <div>
-      <HomeHero apiBase={process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'} />
-
-      <HomeFeatures />
+      <Hero />
+      <CategoryGrid />
+      <DealsSection />
+      <Brands />
+      <Testimonials />
+      <Newsletter />
     </div>
   );
 }

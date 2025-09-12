@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useI18n } from './i18n/provider'
 import { LangToggle } from './lang-toggle'
 import { MiniCart } from './mini-cart'
+import { ThemeToggle } from './theme-toggle'
 
 function CartLink() {
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '/api'
@@ -42,6 +43,7 @@ export function Header() {
           <Link className="hover:text-foreground" href="/support/order-lookup">{t('nav.support')}</Link>
           <MiniCart />
           <Link className="hover:text-foreground" href="/orders">{t('nav.orders')}</Link>
+          <ThemeToggle />
           <LangToggle />
         </nav>
       </div>
