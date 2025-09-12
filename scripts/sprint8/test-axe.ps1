@@ -16,11 +16,23 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Get-NpxPath {
+  if ($IsWindows) {
+    $cmd = Get-Command 'npx.cmd' -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Path }
+  }
+  $sh = Get-Command 'npx' -ErrorAction SilentlyContinue
+  if ($sh) { return $sh.Path }
+  return $null
+}
+
 function Run-Pa11y([string]$url) {
   Write-Host "[axe] Checking $url" -ForegroundColor Cyan
-  # Use npx to fetch pa11y on demand; tolerate install noise
-  $proc = Start-Process -FilePath "npx" -ArgumentList @('-y','pa11y', $url, '--wait', '500', '--timeout', '30000') -NoNewWindow -PassThru -Wait
-  if ($proc.ExitCode -ne 0) { throw "pa11y failed for $url (exit $($proc.ExitCode))" }
+  $npx = Get-NpxPath
+  if (-not $npx) { throw 'npx not found on PATH. Install Node.js (which provides npx) or set PATH.' }
+  # Invoke synchronously so we capture exit code
+  & $npx -y pa11y $url --wait 500 --timeout 30000
+  if ($LASTEXITCODE -ne 0) { throw "pa11y failed for $url (exit $LASTEXITCODE)" }
 }
 
 if ($WebBase.EndsWith('/')) { $WebBase = $WebBase.TrimEnd('/') }
@@ -35,4 +47,3 @@ try {
   Write-Host "Axe checks FAILED" -ForegroundColor Red
   exit 1
 }
-

@@ -23,7 +23,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   const o = data.order
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-semibold"><span suppressHydrationWarning={true}>Order</span> {o.id}</h1>
+      <h1 className="text-2xl font-semibold"><I18nText k="orders.order" fallback="Order" /> {o.id}</h1>
       <div className="border rounded p-4 bg-white space-y-1">
         <div>Status: {o.status}</div>
         <div>Date: {new Date(o.createdAt).toLocaleString()}</div>
@@ -47,4 +47,5 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     </div>
   )
 }
+import { I18nText } from '../../../components/i18n/text'
 import { I18nText } from '../../../components/i18n/text'

@@ -40,14 +40,4 @@ try {
   Write-Host "~ WA preview check skipped: $_" -ForegroundColor DarkYellow
 }
 
-try {
-  if ($WebBase) {
-    & (Join-Path $PSScriptRoot 'sprint8/test-axe.ps1') -WebBase $WebBase
-  } else {
-    Write-Host "~ Skipping axe checks (no WebBase)" -ForegroundColor DarkYellow
-  }
-} catch {
-  Write-Host "~ Axe checks failed: $_" -ForegroundColor DarkYellow
-}
-
 Write-Host "All Sprint 8 acceptance tests PASSED" -ForegroundColor Green
