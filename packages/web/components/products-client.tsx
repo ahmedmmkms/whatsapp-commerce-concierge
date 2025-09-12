@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from './ui/button'
+import { AddToCartButton } from './add-to-cart-button'
 import { Card, CardBody, CardTitle, CardSubtitle } from './ui/card'
 import { Price } from './price'
 import { IconSearch } from './icons'
@@ -23,7 +24,7 @@ export default function ProductsClient({ items, categories, q, category, priceMi
   return (
     <div>
       <h1 className="prose-title mb-4">{t('products.title')}</h1>
-      <form className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
+      <form method="get" action="/products" className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
         <div className="md:col-span-2 flex items-center gap-2">
           <div className="relative w-full">
             <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -81,8 +82,9 @@ export default function ProductsClient({ items, categories, q, category, priceMi
                 <CardSubtitle className="mt-1">
                   <Price minor={p.price} currency={p.currency} />
                 </CardSubtitle>
-                <div className="mt-3">
+                <div className="mt-3 flex gap-2">
                   <Link className="btn btn-outline" href={`/products/${p.id}`}>{t('products.view')}</Link>
+                  <AddToCartButton productId={p.id} />
                 </div>
               </CardBody>
             </Card>

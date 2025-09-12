@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { ChatToOrderButton } from '../../../components/chat-to-order-button'
 import { BackToProductsButton } from '../../../components/back-to-products-button'
+import { AddToCartButton } from '../../../components/add-to-cart-button'
 import ProductViewTracker from './tracker'
 import { NotFoundText } from '../../../components/not-found-text'
 
@@ -47,6 +48,7 @@ export default async function ProductDetail({ params }: { params: { id: string }
       {p.description && (<p className="prose-subtle mt-2">{p.description}</p>)}
 
       <div className="mt-6 flex gap-3">
+        <AddToCartButton productId={p.id} />
         <ChatToOrderButton productId={p.id} name={p.name} currency={p.currency} priceMinor={p.price} />
         <BackToProductsButton />
       </div>

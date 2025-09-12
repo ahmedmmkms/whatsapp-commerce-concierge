@@ -94,10 +94,24 @@
   - Add `scripts/sprint7-smoke.ps1` and `scripts/sprint7-acceptance.ps1` (aggregate perf/compliance checks).
 
 ## Sprint 8
-- [Sprint 8] UI Polish (Support + WA templates)
-  - Support page UX polish: RTL labels, Arabic copy, accessibility pass.
-  - Visual tweaks and readability for template-driven messages (AR/EN).
-  - Minor styling consistency across web pages (buttons, spacing, states).
+- [Sprint 8] Support page polish (frontend, i18n, accessibility)
+  - Internationalize labels/messages; Arabic copy review; enforce RTL form layout.
+  - Replace raw JSON with order summary cards; show correlation ID (X-Request-ID) on result/error.
+  - Better errors for 404/429/5xx; include throttling/captcha hints; loading and empty states.
+  - Use shared UI components; keyboard focus styles and ARIA; axe pass.
+- [Sprint 8] WhatsApp templates polish + preview (whatsapp, cms, i18n)
+  - Review/update AR/EN templates for 'order_status', 'start_return', 'rma_instructions', 'human_handoff' (punctuation, line breaks, placeholders).
+  - Add web preview page (admin-protected) to exercise `/whatsapp/preview` by key/locale with sample data.
+  - Seed updated templates; migration to adjust texts safely.
+- [Sprint 8] Analytics & telemetry (analytics, observability)
+  - Track support lookup events (start/success/fail) with reason and requestId; WA intent events from preview.
+  - Dashboard additions: support success rate, time-to-first-reply, funnel from support to WA chat.
+- [Sprint 8] QA scripts and acceptance (qa, scripts)
+  - Add `scripts/sprint8-smoke.ps1` and `scripts/sprint8-acceptance.ps1`; include axe accessibility checks for /support.
+  - Update `scripts/acceptance-all.ps1` to include Sprint 8.
+- [Sprint 8] Docs & Ops (docs, ops)
+  - `docs/sprint-8-features.md` with scope, acceptance, and rollout notes.
+  - Support triage SOP: correlation ID usage, known errors, and customer messaging templates.
 
 ---
 ## Bootstrap to GitHub

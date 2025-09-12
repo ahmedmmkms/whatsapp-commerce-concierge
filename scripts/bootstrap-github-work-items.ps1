@@ -4,6 +4,7 @@ param(
   [string]$Repo,
   [string]$Token = $env:GITHUB_TOKEN,
   [switch]$DryRun,
+  [switch]$Offline,
   [int]$OnlySprint
 )
 
@@ -20,20 +21,28 @@ function Get-RepoFromGitRemote {
   }
 }
 
-if (-not $Owner -or -not $Repo) {
-  $r = Get-RepoFromGitRemote
-  $Owner = $r.Owner
-  $Repo = $r.Repo
+if (-not $Offline) {
+  if (-not $Owner -or -not $Repo) {
+    $r = Get-RepoFromGitRemote
+    $Owner = $r.Owner
+    $Repo = $r.Repo
+  }
+  if (-not $Token) {
+    throw 'GITHUB_TOKEN not set. Provide -Token or set env var.'
+  }
+  $base = "https://api.github.com/repos/$Owner/$Repo"
+  $headers = @{ Authorization = "Bearer $Token"; 'User-Agent' = 'mvp-bootstrap-script'; Accept = 'application/vnd.github+json' }
+} else {
+  if (-not $Owner) { $Owner = 'offline' }
+  if (-not $Repo) { $Repo = 'offline' }
+  $base = "https://api.github.com/repos/$Owner/$Repo"
+  $headers = @{}
 }
-
-if (-not $Token) {
-  throw 'GITHUB_TOKEN not set. Provide -Token or set env var.'
-}
-
-$base = "https://api.github.com/repos/$Owner/$Repo"
-$headers = @{ Authorization = "Bearer $Token"; 'User-Agent' = 'mvp-bootstrap-script'; Accept = 'application/vnd.github+json' }
 
 function Ensure-Label([string]$name, [string]$color, [string]$description) {
+  if ($Offline) {
+    Write-Host "[OFFLINE][DRYRUN] Ensure label: $name ($color)"; return @{ name = $name }
+  }
   $existing = Invoke-RestMethod -Method GET -Uri "$base/labels?per_page=100" -Headers $headers
   $match = $existing | Where-Object { $_.name -eq $name }
   if ($match) { return $match }
@@ -43,6 +52,9 @@ function Ensure-Label([string]$name, [string]$color, [string]$description) {
 }
 
 function Get-OrCreateMilestone([string]$title, [string]$description, [datetime]$dueOn) {
+  if ($Offline) {
+    Write-Host "[OFFLINE][DRYRUN] Ensure milestone: $title (due $($dueOn.ToShortDateString()))"; return @{ number = -1; title = $title }
+  }
   $existing = Invoke-RestMethod -Method GET -Uri "$base/milestones?state=all&per_page=100" -Headers $headers
   $match = $existing | Where-Object { $_.title -eq $title }
   if ($match) { return $match }
@@ -54,6 +66,10 @@ function Get-OrCreateMilestone([string]$title, [string]$description, [datetime]$
 }
 
 function Ensure-Issue([string]$title, [string]$body, [string[]]$labels, [int]$milestoneNumber) {
+  if ($Offline) {
+    Write-Host "[OFFLINE][DRYRUN] Create/ensure issue: $title (milestone #$milestoneNumber) [labels: $($labels -join ', ')]"
+    return $null
+  }
   $queryTitle = [System.Web.HttpUtility]::UrlEncode($title)
   $existing = Invoke-RestMethod -Method GET -Uri "$base/issues?state=all&per_page=100" -Headers $headers | Where-Object { $_.title -eq $title }
   if ($existing) {

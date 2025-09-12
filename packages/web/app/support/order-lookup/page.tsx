@@ -9,6 +9,7 @@ export default function OrderLookupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
 
   const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
@@ -16,14 +17,17 @@ export default function OrderLookupPage() {
     e.preventDefault();
     setError(null);
     setResult(null);
+    setRequestId(null);
     setLoading(true);
     try {
       let payload: any = {};
       if (orderId) {
         const r = await fetch(`${apiBase}/orders/${encodeURIComponent(orderId)}`);
+        setRequestId(r.headers.get('x-request-id'));
         payload = await r.json();
       } else if (phone) {
         const r = await fetch(`${apiBase}/orders?phone=${encodeURIComponent(phone)}`);
+        setRequestId(r.headers.get('x-request-id'));
         payload = await r.json();
       } else {
         setError("Provide order ID or phone (E.164)");
@@ -58,11 +62,35 @@ export default function OrderLookupPage() {
       {error && <div className="text-red-600 text-sm">{error}</div>}
 
       {result && (
-        <div className="border rounded p-4 bg-white">
-          <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
+        <div className="space-y-3">
+          {'orders' in result && Array.isArray(result.orders) && (
+            <div className="space-y-2">
+              {result.orders.map((o: any) => (
+                <div key={o.id} className="border rounded p-3 bg-white">
+                  <div className="font-medium">Order {o.id}</div>
+                  <div className="text-sm text-muted-foreground">{new Date(o.createdAt).toLocaleString()} — {o.status}</div>
+                  <div className="text-sm">Total: {(o.totalMinor / 100).toFixed(2)} {o.currency}</div>
+                  <div className="mt-2"><a className="btn btn-outline btn-sm" href={`/orders/${encodeURIComponent(o.id)}`}>View</a></div>
+                </div>
+              ))}
+              {result.orders.length === 0 && (
+                <div className="text-sm text-muted-foreground">No orders found for this phone.</div>
+              )}
+            </div>
+          )}
+          {'order' in result && result.order && (
+            <div className="border rounded p-4 bg-white">
+              <div className="font-medium mb-2">Order {result.order.id}</div>
+              <div className="text-sm text-muted-foreground">{new Date(result.order.createdAt).toLocaleString()} — {result.order.status}</div>
+              <div className="text-sm mb-2">Total: {(result.order.totalMinor / 100).toFixed(2)} {result.order.currency}</div>
+              <div className="mt-2"><a className="btn btn-outline btn-sm" href={`/orders/${encodeURIComponent(result.order.id)}`}>View Details</a></div>
+            </div>
+          )}
+          {requestId && (
+            <div className="text-xs text-muted-foreground">Request ID: {requestId}</div>
+          )}
         </div>
       )}
     </div>
   );
 }
-
