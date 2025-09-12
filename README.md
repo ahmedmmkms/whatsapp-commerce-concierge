@@ -12,7 +12,6 @@ Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience 
 
  - Live Demo (Web): <https://whatsapp-commerce-concierge-web.vercel.app>
  - API (Swagger): <https://whatsapp-commerce-concierge-api.vercel.app/docs>
-- Hero screenshot: add `docs/hero.png` or `public/og.png` to showcase the app
 
 ## Screenshots
 
@@ -95,7 +94,7 @@ Below are representative desktop screenshots (PNG) from `site_screens/`.
 | Infra/Deploy | Vercel (API/Web), Dockerfiles, docker-compose for local |
 | CI/CD | GitHub Actions (build/test), Prisma DB deploy, PR hygiene checks |
 | Observability | Sentry placeholders, request/trace logging, metrics endpoint |
-| i18n & RTL | Custom provider (AR/EN core; FR/JA scaffolding ready) |
+| i18n & RTL | Custom provider (AR/EN core) |
 | Security | CORS, rate limiting, admin token guard, HMAC webhook signatures |
 
 ## Architecture Overview
