@@ -1,3 +1,5 @@
+import { I18nText } from '../../../components/i18n/text'
+
 async function getApiBase() {
   return (
     process.env.NEXT_PUBLIC_API_URL ||
@@ -47,5 +49,3 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     </div>
   )
 }
-import { I18nText } from '../../../components/i18n/text'
-import { I18nText } from '../../../components/i18n/text'
