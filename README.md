@@ -2,7 +2,6 @@
 
 Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience that blends WhatsApp conversational flows with a high‑performing web storefront — designed with performance, a11y, i18n, and operational excellence from day one.
 
-[![CI](https://img.shields.io/github/actions/workflow/status/<owner>/<repo>/ci.yml?branch=main)](https://github.com/<owner>/<repo>/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-10-E0234E)](https://nestjs.com/)
