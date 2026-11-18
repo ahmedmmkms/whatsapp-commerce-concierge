@@ -144,7 +144,7 @@ const extraEn: Dict = {
   'sections.best.title': 'Best-Sellers',
   'sections.new.title': 'New Arrivals',
   'sections.brands.title': 'Shop by Brand',
-  'sections.testimonials.title': 'What customers say',
+  'sections.testimonials.title': 'Sample reviews (demo data)',
   'sections.why.title': 'Why buy from us?',
   'product.addToCart': 'Add to Cart',
   'product.view': 'View',
