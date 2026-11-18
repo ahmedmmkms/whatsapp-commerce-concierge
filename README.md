@@ -1,6 +1,6 @@
-# <ProjectName> — Electronics Commerce on WhatsApp + Web, Built for Speed and Scale
+# WhatsApp Commerce Concierge — Bilingual Commerce on WhatsApp + Web
 
-Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience that blends WhatsApp conversational flows with a high‑performing web storefront — designed with performance, a11y, i18n, and operational excellence from day one.
+An independent MVP that lets shoppers browse, order, track and return products through WhatsApp or a web storefront, in Arabic or English, with one backend behind both.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
@@ -11,6 +11,25 @@ Top Tech. Sharp Prices. Fast Delivery. A production‑ready commerce experience 
 
  - Live Demo (Web): <https://whatsapp-commerce-concierge-web.vercel.app>
  - API (Swagger): <https://whatsapp-commerce-concierge-api.vercel.app/docs>
+
+## Product Brief
+
+_Status: independent MVP with a live demo. Not yet used by real customers; the problem and metrics below are assumptions a pilot would test._
+
+**Problem.** Many shoppers in the region would rather ask and order over WhatsApp than fill in a web form, but small merchants handle those chats by hand, so orders, returns and support requests get lost in message threads.
+
+**Who it's for.** Arabic- and English-speaking shoppers of an electronics store, and the store staff who handle orders, returns and support.
+
+**Key decisions and trade-offs**
+- **One backend for WhatsApp and web.** A chat can hand off to the web cart and checkout instead of rebuilding checkout inside WhatsApp. Trade-off: two front doors to design and test.
+- **Arabic-first with RTL from day one.** More design work up front, but no costly retrofit later.
+- **Cash on delivery next to card payments** (Stripe, test mode), because the target market can't be assumed to pay by card.
+- **Privacy built into the MVP.** PDPL-aware data export and deletion ship with the first release instead of after launch.
+- **Scripted acceptance per sprint.** Each sprint closed only when its acceptance script passed.
+
+**Deliberately out of scope:** live payments, multiple merchants, and AI recommendations.
+
+**What a pilot would measure:** chat-to-order conversion, share of orders started in WhatsApp vs. web, drop-off at the chat-to-checkout handoff, and time to resolve a return or support request.
 
 ## Screenshots
 
@@ -59,11 +78,11 @@ Below are representative desktop screenshots (PNG) from `site_screens/`.
 
 ---
 
-## Why This Matters (for clients) ✨
+## Why It Matters
 
 - Conversational commerce with WhatsApp + Web to accelerate conversion.
 - WCAG‑friendly, bilingual (AR/EN) UX with RTL support — built for MENA audiences.
-- Production‑ready APIs with idempotency, rate limits, and observability baked in.
+- APIs designed with idempotency, rate limits, and observability from the start.
 - PDPL‑aware data export/delete flows and audit trails.
 - Cloud‑native deployment (Vercel/Neon/Upstash) with CI/CD and infra scripts.
 - Fast by default: caching, SSR, API budgets, and perf/load testing hooks.
@@ -280,20 +299,9 @@ Migrations live in `packages/api/prisma/migrations`, applied via Prisma.
 
 This project is licensed under the terms of the repository’s LICENSE. See [LICENSE](LICENSE).
 
-## About the Author 
+## About
 
-- I deliver production‑grade commerce experiences — fast, bilingual, and reliable.
-- Architecture that holds: modular monorepo, service boundaries, and serverless‑ready APIs.
-- Ops you can trust: CI/CD, migrations, observability, performance/load testing hooks.
-- Great DX: clean code, documentation, scripted acceptance, and smooth handoffs.
-- Customer‑centric UX: accessibility and Arabic‑first details you don’t have to ask for.
-
-Contact:
- - [ ![LinkedIn](https://img.shields.io/badge/LinkedIn-ahmedmmkms-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ahmedmmkms/) 
-
-
-Services:
-- Product engineering, architecture, cloud/DevOps, developer experience, performance, accessibility, i18n.
+Built by **Ahmed Mahmoud Moustafa**, technical product manager and systems engineer, as part of an independent product portfolio. More case studies and projects: [github.com/ahmedmmkms](https://github.com/ahmedmmkms) · [LinkedIn](https://www.linkedin.com/in/ahmedmmkms/)
 
 ---
 
